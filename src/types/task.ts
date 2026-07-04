@@ -23,17 +23,23 @@ export interface Task {
   isArchived: boolean;
   reminderEnabled: boolean;
   estimatedDuration: string;
-  // Advanced Features
   subtasks: Subtask[];
   recurringInterval: RecurringInterval;
-  dependencies: string[]; // IDs of tasks this task depends on
+  dependencies: string[];
   isTemplate: boolean;
   pomodoroSessions: number;
-  actualDuration?: number; // in minutes
+  actualDuration?: number;
 }
 
 export type SortOption = 'Newest' | 'Oldest' | 'Alphabetical' | 'Due Date' | 'Priority' | 'Custom';
 export type FilterOption = 'All' | 'Today' | 'Upcoming' | 'Completed' | 'Archived' | 'Pinned' | 'Important' | 'Overdue';
+
+export interface AppSettings {
+  animationsEnabled: boolean;
+  remindersEnabled: boolean;
+  defaultFilter: FilterOption;
+  defaultSort: SortOption;
+}
 
 export interface Achievement {
   id: string;

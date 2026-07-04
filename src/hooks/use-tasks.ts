@@ -1,12 +1,20 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Task, SortOption, FilterOption, Category, Priority, RecurringInterval, Subtask } from '@/types/task';
+import { Task, SortOption, FilterOption, Category, Priority, AppSettings } from '@/types/task';
 import { 
-  isToday, isAfter, isBefore, parseISO, startOfDay, subDays, 
-  isSameDay, addDays, addWeeks, addMonths, addYears, format 
+  isToday, isAfter, isBefore, parseISO, startOfDay, 
+  isSameDay, format 
 } from 'date-fns';
 import { showSuccess, showError } from '@/utils/toast';
 
 const STORAGE_KEY = 'taskflow_tasks_v2';
+const SETTINGS_KEY = 'taskflow_settings_v2';
+
+const DEFAULT_SETTINGS: AppSettings = {
+  animationsEnabled: true,
+  remindersEnabled: true,
+  defaultFilter: 'All',
+  defaultSort: 'Newest'
+};
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState<Task[]>(() => {
@@ -14,29 +22,65 @@ export const useTasks = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [settings, setSettings] = useState<AppSettings>(() => {
+    const saved = localStorage.getItem(SETTINGS_KEY);
+    return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
+  });
+
   const [history, setHistory] = useState<Task[][]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState<FilterOption>('All');
+  const [filter, setFilter] = useState<FilterOption>(settings.defaultFilter);
   const [categoryFilter, setCategoryFilter] = useState<Category | 'All'>('All');
   const [priorityFilter, setPriorityFilter] = useState<Priority | 'All'>('All');
-  const [sortBy, setSortBy] = useState<SortOption>('Newest');
+  const [sortBy, setSortBy] = useState<SortOption>(settings.defaultSort);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
   }, [tasks]);
 
+  useEffect(() => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  }, [settings]);
+
   const saveToHistory = useCallback(() => {
     setHistory(prev => [tasks, ...prev].slice(0, 20));
   }, [tasks]);
 
-  const undo = useCallback(() => {
-    if (history.length > 0) {
-      const previous = history[0];
-      setTasks(previous);
-      setHistory(prev => prev.slice(1));
-      showSuccess("Action undone");
+  const updateSettings = (updates: Partial<AppSettings>) => {
+    setSettings(prev => ({ ...prev, ...updates }));
+    showSuccess("Settings updated");
+  };
+
+  const resetData = () => {
+    setTasks([]);
+    setSettings(DEFAULT_SETTINGS);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SETTINGS_KEY);
+    showSuccess("All data has been reset");
+    window.location.reload();
+  };
+
+  const exportData = () => {
+    const data = { tasks, settings };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `taskflow_backup_${format(new Date(), 'yyyy-MM-dd')}.json`;
+    link.click();
+    showSuccess("Data exported successfully");
+  };
+
+  const importData = (jsonString: string) => {
+    try {
+      const data = JSON.parse(jsonString);
+      if (data.tasks) setTasks(data.tasks);
+      if (data.settings) setSettings(data.settings);
+      showSuccess("Data imported successfully");
+    } catch (e) {
+      showError("Invalid backup file");
     }
-  }, [history]);
+  };
 
   const addTask = (taskData: Partial<Task>) => {
     saveToHistory();
@@ -58,11 +102,12 @@ export const useTasks = () => {
       subtasks: taskData.subtasks || [],
       recurringInterval: taskData.recurringInterval || 'None',
       dependencies: taskData.dependencies || [],
-      isTemplate: taskData.isTemplate || false,
+      isTemplate: false,
       pomodoroSessions: 0,
       ...taskData
     };
     setTasks(prev => [newTask, ...prev]);
+    showSuccess("Task created");
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
@@ -75,22 +120,14 @@ export const useTasks = () => {
   const deleteTask = (id: string) => {
     saveToHistory();
     setTasks(prev => prev.filter(task => task.id !== id));
-  };
-
-  const duplicateTask = (task: Task) => {
-    addTask({
-      ...task,
-      title: `${task.title} (Copy)`,
-      id: undefined,
-      createdAt: undefined,
-      isCompleted: false
-    });
+    showSuccess("Task deleted");
   };
 
   const toggleComplete = (id: string) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
     updateTask(id, { isCompleted: !task.isCompleted });
+    if (!task.isCompleted) showSuccess("Task completed!");
   };
 
   const togglePin = (id: string) => {
@@ -114,7 +151,6 @@ export const useTasks = () => {
   const filteredTasks = useMemo(() => {
     let result = [...tasks];
 
-    // Search
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(t => 
@@ -124,7 +160,6 @@ export const useTasks = () => {
       );
     }
 
-    // Status Filter
     if (filter !== 'All') {
       const today = startOfDay(new Date());
       switch (filter) {
@@ -151,21 +186,17 @@ export const useTasks = () => {
           break;
       }
     } else {
-      // By default, don't show archived tasks in "All"
       result = result.filter(t => !t.isArchived);
     }
 
-    // Category Filter
     if (categoryFilter !== 'All') {
       result = result.filter(t => t.category === categoryFilter);
     }
 
-    // Priority Filter
     if (priorityFilter !== 'All') {
       result = result.filter(t => t.priority === priorityFilter);
     }
 
-    // Sorting
     result.sort((a, b) => {
       switch (sortBy) {
         case 'Newest':
@@ -204,15 +235,18 @@ export const useTasks = () => {
   return {
     tasks,
     filteredTasks,
+    settings,
+    updateSettings,
+    resetData,
+    exportData,
+    importData,
     addTask,
     updateTask,
     deleteTask,
-    duplicateTask,
     toggleComplete,
     togglePin,
     toggleImportant,
     toggleArchive,
-    undo,
     stats,
     searchQuery,
     setSearchQuery,
