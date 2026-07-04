@@ -1,11 +1,12 @@
 {
-  "name": "TaskFlow",
+  "name": "TaskFlow Premium",
   "short_name": "TaskFlow",
-  "description": "Organize your life beautifully.",
+  "description": "The ultimate productivity suite for high achievers.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F8FAFC",
+  "background_color": "#FFFFFF",
   "theme_color": "#2563EB",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/placeholder.svg",
@@ -18,6 +19,18 @@
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Task",
+      "url": "/tasks?action=new",
+      "icons": [{ "src": "/placeholder.svg", "sizes": "192x192" }]
+    },
+    {
+      "name": "Focus Mode",
+      "url": "/focus",
+      "icons": [{ "src": "/placeholder.svg", "sizes": "192x192" }]
     }
   ]
 }

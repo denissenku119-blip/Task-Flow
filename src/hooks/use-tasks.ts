@@ -1,23 +1,13 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Task, SortOption, FilterOption, Category, Priority } from '@/types/task';
-import { isToday, isAfter, parseISO, startOfDay, subDays, isSameDay } from 'date-fns';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Task, SortOption, FilterOption, Category, Priority, RecurringInterval, Subtask } from '@/types/task';
+import { 
+  isToday, isAfter, isBefore, parseISO, startOfDay, subDays, 
+  isSameDay, addDays, addWeeks, addMonths, addYears, format 
+} from 'date-fns';
+import { showSuccess, showError } from '@/utils/toast';
 
-const STORAGE_KEY = 'taskflow_tasks';
-const SETTINGS_KEY = 'taskflow_settings';
-
-interface AppSettings {
-  defaultSort: SortOption;
-  defaultFilter: FilterOption;
-  animationsEnabled: boolean;
-  remindersEnabled: boolean;
-}
-
-const DEFAULT_SETTINGS: AppSettings = {
-  defaultSort: 'Newest',
-  defaultFilter: 'All',
-  animationsEnabled: true,
-  remindersEnabled: true,
-};
+const STORAGE_KEY = 'taskflow_tasks_v2';
+const SETTINGS_KEY = 'taskflow_settings_v2';
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState<Task[]>(() => {
@@ -25,252 +15,148 @@ export const useTasks = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const [settings, setSettings] = useState<AppSettings>(() => {
-    const saved = localStorage.getItem(SETTINGS_KEY);
-    return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
-  });
-
+  const [history, setHistory] = useState<Task[][]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState<FilterOption>(settings.defaultFilter);
+  const [filter, setFilter] = useState<FilterOption>('All');
   const [categoryFilter, setCategoryFilter] = useState<Category | 'All'>('All');
   const [priorityFilter, setPriorityFilter] = useState<Priority | 'All'>('All');
-  const [sortBy, setSortBy] = useState<SortOption>(settings.defaultSort);
+  const [sortBy, setSortBy] = useState<SortOption>('Newest');
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
   }, [tasks]);
 
-  useEffect(() => {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-  }, [settings]);
+  const saveToHistory = useCallback(() => {
+    setHistory(prev => [tasks, ...prev].slice(0, 20));
+  }, [tasks]);
 
-  const updateSettings = (newSettings: Partial<AppSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
-  };
+  const undo = useCallback(() => {
+    if (history.length > 0) {
+      const previous = history[0];
+      setTasks(previous);
+      setHistory(prev => prev.slice(1));
+      showSuccess("Action undone");
+    }
+  }, [history]);
 
-  const addTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'lastEdited' | 'isCompleted' | 'isArchived'>) => {
+  const addTask = (taskData: Partial<Task>) => {
+    saveToHistory();
     const newTask: Task = {
-      ...taskData,
       id: crypto.randomUUID(),
+      title: taskData.title || 'New Task',
+      description: taskData.description || '',
+      dueDate: taskData.dueDate || new Date().toISOString(),
       createdAt: new Date().toISOString(),
       lastEdited: new Date().toISOString(),
+      priority: taskData.priority || 'Medium',
+      category: taskData.category || 'Personal',
       isCompleted: false,
+      isPinned: taskData.isPinned || false,
+      isImportant: taskData.isImportant || false,
       isArchived: false,
+      reminderEnabled: taskData.reminderEnabled || false,
+      estimatedDuration: taskData.estimatedDuration || '',
+      subtasks: taskData.subtasks || [],
+      recurringInterval: taskData.recurringInterval || 'None',
+      dependencies: taskData.dependencies || [],
+      isTemplate: taskData.isTemplate || false,
+      pomodoroSessions: 0,
+      ...taskData
     };
     setTasks(prev => [newTask, ...prev]);
-    
-    if (settings.remindersEnabled && newTask.reminderEnabled) {
-      requestNotificationPermission();
-    }
-  };
-
-  const requestNotificationPermission = async () => {
-    if ('Notification' in window && Notification.permission === 'default') {
-      await Notification.requestPermission();
-    }
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
+    saveToHistory();
     setTasks(prev => prev.map(task => 
       task.id === id ? { ...task, ...updates, lastEdited: new Date().toISOString() } : task
     ));
   };
 
-  const deleteTask = (id: string) => {
-    setTasks(prev => prev.filter(task => task.id !== id));
-  };
-
-  const duplicateTask = (id: string) => {
-    const taskToDuplicate = tasks.find(t => t.id === id);
-    if (taskToDuplicate) {
-      const duplicated: Task = {
-        ...taskToDuplicate,
-        id: crypto.randomUUID(),
-        title: `${taskToDuplicate.title} (Copy)`,
-        createdAt: new Date().toISOString(),
-        lastEdited: new Date().toISOString(),
-      };
-      setTasks(prev => [duplicated, ...prev]);
-    }
-  };
-
   const toggleComplete = (id: string) => {
     const task = tasks.find(t => t.id === id);
-    if (task) {
-      updateTask(id, { isCompleted: !task.isCompleted });
+    if (!task) return;
+
+    // Check dependencies
+    const incompleteDeps = tasks.filter(t => task.dependencies.includes(t.id) && !t.isCompleted);
+    if (incompleteDeps.length > 0 && !task.isCompleted) {
+      showError(`Complete dependencies first: ${incompleteDeps.map(d => d.title).join(', ')}`);
+      return;
     }
-  };
 
-  const togglePin = (id: string) => {
-    const task = tasks.find(t => t.id === id);
-    if (task) {
-      updateTask(id, { isPinned: !task.isPinned });
-    }
-  };
-
-  const toggleImportant = (id: string) => {
-    const task = tasks.find(t => t.id === id);
-    if (task) {
-      updateTask(id, { isImportant: !task.isImportant });
-    }
-  };
-
-  const toggleArchive = (id: string) => {
-    const task = tasks.find(t => t.id === id);
-    if (task) {
-      updateTask(id, { isArchived: !task.isArchived });
-    }
-  };
-
-  const filteredTasks = useMemo(() => {
-    let result = tasks.filter(task => {
-      const matchesSearch = 
-        task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        task.category.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      if (!matchesSearch) return false;
-
-      if (categoryFilter !== 'All' && task.category !== categoryFilter) return false;
-      if (priorityFilter !== 'All' && task.priority !== priorityFilter) return false;
-
-      const taskDate = parseISO(task.dueDate);
-      const today = startOfDay(new Date());
-
-      switch (filter) {
-        case 'Today':
-          return isToday(taskDate) && !task.isArchived;
-        case 'Upcoming':
-          return isAfter(taskDate, today) && !task.isArchived && !task.isCompleted;
-        case 'Completed':
-          return task.isCompleted && !task.isArchived;
-        case 'Archived':
-          return task.isArchived;
-        case 'Pinned':
-          return task.isPinned && !task.isArchived;
-        case 'Important':
-          return task.isImportant && !task.isArchived;
-        default:
-          return !task.isArchived;
-      }
-    });
-
-    result.sort((a, b) => {
-      switch (sortBy) {
-        case 'Oldest':
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        case 'Alphabetical':
-          return a.title.localeCompare(b.title);
-        case 'Due Date':
-          return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-        case 'Priority':
-          const priorityMap = { Urgent: 0, High: 1, Medium: 2, Low: 3 };
-          return priorityMap[a.priority] - priorityMap[b.priority];
-        default:
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }
-    });
-
-    return result;
-  }, [tasks, searchQuery, filter, categoryFilter, priorityFilter, sortBy]);
-
-  const streak = useMemo(() => {
-    const completedDates = tasks
-      .filter(t => t.isCompleted)
-      .map(t => startOfDay(parseISO(t.lastEdited)).getTime());
+    saveToHistory();
+    const isCompleting = !task.isCompleted;
     
-    const uniqueDates = Array.from(new Set(completedDates)).sort((a, b) => b - a);
-    
-    let currentStreak = 0;
-    let checkDate = startOfDay(new Date());
-
-    // If no tasks completed today, check if streak was alive yesterday
-    if (!uniqueDates.some(d => isSameDay(d, checkDate))) {
-      checkDate = subDays(checkDate, 1);
+    if (isCompleting && task.recurringInterval !== 'None') {
+      // Create next occurrence
+      const nextDate = calculateNextOccurrence(parseISO(task.dueDate), task.recurringInterval);
+      addTask({
+        ...task,
+        dueDate: nextDate.toISOString(),
+        isCompleted: false,
+        subtasks: task.subtasks.map(s => ({ ...s, isCompleted: false }))
+      });
     }
 
-    for (let i = 0; i < uniqueDates.length; i++) {
-      if (isSameDay(uniqueDates[i], checkDate)) {
-        currentStreak++;
-        checkDate = subDays(checkDate, 1);
-      } else {
-        break;
+    updateTask(id, { isCompleted: isCompleting });
+  };
+
+  const calculateNextOccurrence = (date: Date, interval: RecurringInterval): Date => {
+    switch (interval) {
+      case 'Daily': return addDays(date, 1);
+      case 'Weekly': return addWeeks(date, 1);
+      case 'Biweekly': return addWeeks(date, 2);
+      case 'Monthly': return addMonths(date, 1);
+      case 'Yearly': return addYears(date, 1);
+      case 'Weekdays': {
+        let next = addDays(date, 1);
+        while (next.getDay() === 0 || next.getDay() === 6) next = addDays(next, 1);
+        return next;
       }
+      case 'Weekends': {
+        let next = addDays(date, 1);
+        while (next.getDay() !== 0 && next.getDay() !== 6) next = addDays(next, 1);
+        return next;
+      }
+      default: return date;
     }
+  };
 
-    return currentStreak;
-  }, [tasks]);
+  const deleteTask = (id: string) => {
+    saveToHistory();
+    setTasks(prev => prev.filter(task => task.id !== id));
+  };
 
   const stats = useMemo(() => {
     const active = tasks.filter(t => !t.isArchived);
     const completed = active.filter(t => t.isCompleted).length;
     const total = active.length;
-    const pending = total - completed;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
     
-    const todayTasks = tasks.filter(t => !t.isArchived && isToday(parseISO(t.dueDate)));
-    const pinnedTasks = tasks.filter(t => !t.isArchived && t.isPinned);
+    const today = startOfDay(new Date());
+    const todayTasks = active.filter(t => isSameDay(parseISO(t.dueDate), today));
+    const overdueTasks = active.filter(t => !t.isCompleted && isBefore(parseISO(t.dueDate), today));
 
-    return { total, completed, pending, percentage, todayTasks, pinnedTasks, streak };
-  }, [tasks, streak]);
-
-  const resetData = () => {
-    setTasks([]);
-    setSettings(DEFAULT_SETTINGS);
-    localStorage.removeItem(STORAGE_KEY);
-    localStorage.removeItem(SETTINGS_KEY);
-  };
-
-  const exportData = () => {
-    const dataStr = JSON.stringify({ tasks, settings }, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    const exportFileDefaultName = 'taskflow_backup.json';
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  };
-
-  const importData = (jsonString: string) => {
-    try {
-      const imported = JSON.parse(jsonString);
-      if (imported.tasks && Array.isArray(imported.tasks)) {
-        setTasks(imported.tasks);
-        if (imported.settings) setSettings(imported.settings);
-      } else if (Array.isArray(imported)) {
-        setTasks(imported);
-      }
-    } catch (e) {
-      console.error("Failed to import data", e);
-    }
-  };
+    return { total, completed, pending: total - completed, percentage, todayTasks, overdueTasks };
+  }, [tasks]);
 
   return {
     tasks,
-    filteredTasks,
+    addTask,
+    updateTask,
+    deleteTask,
+    toggleComplete,
+    undo,
+    stats,
     searchQuery,
     setSearchQuery,
     filter,
     setFilter,
+    sortBy,
+    setSortBy,
     categoryFilter,
     setCategoryFilter,
     priorityFilter,
-    setPriorityFilter,
-    sortBy,
-    setSortBy,
-    settings,
-    updateSettings,
-    addTask,
-    updateTask,
-    deleteTask,
-    duplicateTask,
-    toggleComplete,
-    togglePin,
-    toggleImportant,
-    toggleArchive,
-    stats,
-    resetData,
-    exportData,
-    importData
+    setPriorityFilter
   };
 };
