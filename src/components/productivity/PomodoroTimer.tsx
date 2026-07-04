@@ -4,8 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, RotateCcw, Coffee, Zap } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 import { showSuccess } from '@/utils/toast';
+import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 const PomodoroTimer = () => {
   const [timeLeft, setTimeLeft] = useState(25 * 60);
