@@ -7,10 +7,12 @@ import TaskCard from '@/components/tasks/TaskCard';
 import TaskForm from '@/components/tasks/TaskForm';
 import { useTasks } from '@/hooks/use-tasks';
 import { Button } from '@/components/ui/button';
-import { Plus, ArrowRight, Sparkles } from 'lucide-react';
+import { Plus, ArrowRight, Sparkles, Flame, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Task } from '@/types/task';
+import { Progress } from '@/components/ui/progress';
+import { Card } from '@/components/ui/card';
 
 const Index = () => {
   const { 
@@ -22,7 +24,8 @@ const Index = () => {
     toggleComplete, 
     togglePin, 
     toggleImportant, 
-    toggleArchive 
+    toggleArchive,
+    settings
   } = useTasks();
 
   const [isFormOpen, setIsFormOpen] = React.useState(false);
@@ -64,16 +67,48 @@ const Index = () => {
             <p>{randomMessage}</p>
           </div>
         </div>
-        <Button 
-          onClick={() => { setEditingTask(null); setIsFormOpen(true); }}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 h-12 gap-2 shadow-lg shadow-blue-500/20"
-        >
-          <Plus size={20} />
-          New Task
-        </Button>
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-xl font-bold border border-orange-100 dark:border-orange-900/30">
+            <Flame size={20} className="fill-orange-500" />
+            <span>{stats.streak} Day Streak</span>
+          </div>
+          <Button 
+            onClick={() => { setEditingTask(null); setIsFormOpen(true); }}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6 h-12 gap-2 shadow-lg shadow-blue-500/20"
+          >
+            <Plus size={20} />
+            New Task
+          </Button>
+        </div>
       </div>
 
-      <StatsGrid stats={stats} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="lg:col-span-2">
+          <StatsGrid stats={stats} />
+        </div>
+        <Card className="p-6 border-slate-200 dark:border-slate-800 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-500/20">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-white/20 rounded-lg">
+              <Target size={24} />
+            </div>
+            <h3 className="font-bold text-lg">Daily Progress</h3>
+          </div>
+          <div className="space-y-4">
+            <div className="flex justify-between text-sm font-medium">
+              <span>{stats.completed} of {stats.total} tasks done</span>
+              <span>{stats.percentage}%</span>
+            </div>
+            <Progress value={stats.percentage} className="h-3 bg-white/20" />
+            <p className="text-blue-100 text-sm leading-relaxed">
+              {stats.percentage === 100 
+                ? "Incredible! You've cleared your list for today." 
+                : stats.percentage > 50 
+                ? "You're more than halfway there! Keep pushing." 
+                : "Start small, finish big. You've got this!"}
+            </p>
+          </div>
+        </Card>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Pinned Tasks */}

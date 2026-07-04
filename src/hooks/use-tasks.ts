@@ -1,8 +1,23 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Task, SortOption, FilterOption, Category, Priority } from '@/types/task';
-import { isToday, isAfter, parseISO, startOfDay } from 'date-fns';
+import { isToday, isAfter, parseISO, startOfDay, subDays, isSameDay } from 'date-fns';
 
 const STORAGE_KEY = 'taskflow_tasks';
+const SETTINGS_KEY = 'taskflow_settings';
+
+interface AppSettings {
+  defaultSort: SortOption;
+  defaultFilter: FilterOption;
+  animationsEnabled: boolean;
+  remindersEnabled: boolean;
+}
+
+const DEFAULT_SETTINGS: AppSettings = {
+  defaultSort: 'Newest',
+  defaultFilter: 'All',
+  animationsEnabled: true,
+  remindersEnabled: true,
+};
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState<Task[]>(() => {
@@ -10,15 +25,28 @@ export const useTasks = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const [settings, setSettings] = useState<AppSettings>(() => {
+    const saved = localStorage.getItem(SETTINGS_KEY);
+    return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState<FilterOption>('All');
+  const [filter, setFilter] = useState<FilterOption>(settings.defaultFilter);
   const [categoryFilter, setCategoryFilter] = useState<Category | 'All'>('All');
   const [priorityFilter, setPriorityFilter] = useState<Priority | 'All'>('All');
-  const [sortBy, setSortBy] = useState<SortOption>('Newest');
+  const [sortBy, setSortBy] = useState<SortOption>(settings.defaultSort);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
   }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  }, [settings]);
+
+  const updateSettings = (newSettings: Partial<AppSettings>) => {
+    setSettings(prev => ({ ...prev, ...newSettings }));
+  };
 
   const addTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'lastEdited' | 'isCompleted' | 'isArchived'>) => {
     const newTask: Task = {
@@ -30,6 +58,16 @@ export const useTasks = () => {
       isArchived: false,
     };
     setTasks(prev => [newTask, ...prev]);
+    
+    if (settings.remindersEnabled && newTask.reminderEnabled) {
+      requestNotificationPermission();
+    }
+  };
+
+  const requestNotificationPermission = async () => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      await Notification.requestPermission();
+    }
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
@@ -136,6 +174,33 @@ export const useTasks = () => {
     return result;
   }, [tasks, searchQuery, filter, categoryFilter, priorityFilter, sortBy]);
 
+  const streak = useMemo(() => {
+    const completedDates = tasks
+      .filter(t => t.isCompleted)
+      .map(t => startOfDay(parseISO(t.lastEdited)).getTime());
+    
+    const uniqueDates = Array.from(new Set(completedDates)).sort((a, b) => b - a);
+    
+    let currentStreak = 0;
+    let checkDate = startOfDay(new Date());
+
+    // If no tasks completed today, check if streak was alive yesterday
+    if (!uniqueDates.some(d => isSameDay(d, checkDate))) {
+      checkDate = subDays(checkDate, 1);
+    }
+
+    for (let i = 0; i < uniqueDates.length; i++) {
+      if (isSameDay(uniqueDates[i], checkDate)) {
+        currentStreak++;
+        checkDate = subDays(checkDate, 1);
+      } else {
+        break;
+      }
+    }
+
+    return currentStreak;
+  }, [tasks]);
+
   const stats = useMemo(() => {
     const active = tasks.filter(t => !t.isArchived);
     const completed = active.filter(t => t.isCompleted).length;
@@ -146,16 +211,18 @@ export const useTasks = () => {
     const todayTasks = tasks.filter(t => !t.isArchived && isToday(parseISO(t.dueDate)));
     const pinnedTasks = tasks.filter(t => !t.isArchived && t.isPinned);
 
-    return { total, completed, pending, percentage, todayTasks, pinnedTasks };
-  }, [tasks]);
+    return { total, completed, pending, percentage, todayTasks, pinnedTasks, streak };
+  }, [tasks, streak]);
 
   const resetData = () => {
     setTasks([]);
+    setSettings(DEFAULT_SETTINGS);
     localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(SETTINGS_KEY);
   };
 
   const exportData = () => {
-    const dataStr = JSON.stringify(tasks, null, 2);
+    const dataStr = JSON.stringify({ tasks, settings }, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
     const exportFileDefaultName = 'taskflow_backup.json';
     const linkElement = document.createElement('a');
@@ -167,7 +234,10 @@ export const useTasks = () => {
   const importData = (jsonString: string) => {
     try {
       const imported = JSON.parse(jsonString);
-      if (Array.isArray(imported)) {
+      if (imported.tasks && Array.isArray(imported.tasks)) {
+        setTasks(imported.tasks);
+        if (imported.settings) setSettings(imported.settings);
+      } else if (Array.isArray(imported)) {
         setTasks(imported);
       }
     } catch (e) {
@@ -188,6 +258,8 @@ export const useTasks = () => {
     setPriorityFilter,
     sortBy,
     setSortBy,
+    settings,
+    updateSettings,
     addTask,
     updateTask,
     deleteTask,
