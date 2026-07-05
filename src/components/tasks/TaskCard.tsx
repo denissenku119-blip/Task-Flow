@@ -6,13 +6,14 @@ import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { 
-  MoreVertical, Calendar, Clock, Pin, Star, 
-  Repeat, ListTree, AlertCircle, ChevronRight 
+  MoreVertical, Calendar, Pin, Star, 
+  Repeat, ListTree, Copy, Archive, Trash2, Edit2
 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from '@/components/ui/button';
@@ -26,9 +27,22 @@ interface TaskCardProps {
   onToggleComplete: (id: string) => void;
   onEdit: (task: Task) => void;
   onDelete: (id: string) => void;
+  onTogglePin: (id: string) => void;
+  onToggleImportant: (id: string) => void;
+  onToggleArchive: (id: string) => void;
+  onDuplicate: (id: string) => void;
 }
 
-const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardProps) => {
+const TaskCard = ({ 
+  task, 
+  onToggleComplete, 
+  onEdit, 
+  onDelete, 
+  onTogglePin, 
+  onToggleImportant, 
+  onToggleArchive, 
+  onDuplicate 
+}: TaskCardProps) => {
   const isOverdue = !task.isCompleted && isBefore(parseISO(task.dueDate), startOfDay(new Date()));
   
   const subtaskProgress = task.subtasks.length > 0 
@@ -71,6 +85,7 @@ const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardProps) =
                 {task.title}
               </h3>
               {task.isPinned && <Pin size={14} className="text-blue-500 fill-blue-500" />}
+              {task.isImportant && <Star size={14} className="text-amber-500 fill-amber-500" />}
               {task.recurringInterval !== 'None' && <Repeat size={14} className="text-slate-400" />}
             </div>
 
@@ -108,9 +123,26 @@ const TaskCard = ({ task, onToggleComplete, onEdit, onDelete }: TaskCardProps) =
                 <MoreVertical size={16} />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="rounded-xl w-40">
-              <DropdownMenuItem onClick={() => onEdit(task)}>Edit</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDelete(task.id)} className="text-red-600">Delete</DropdownMenuItem>
+            <DropdownMenuContent align="end" className="rounded-xl w-48">
+              <DropdownMenuItem onClick={() => onEdit(task)} className="gap-2">
+                <Edit2 size={14} /> Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onTogglePin(task.id)} className="gap-2">
+                <Pin size={14} /> {task.isPinned ? 'Unpin' : 'Pin'}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onToggleImportant(task.id)} className="gap-2">
+                <Star size={14} /> {task.isImportant ? 'Unmark' : 'Mark Important'}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDuplicate(task.id)} className="gap-2">
+                <Copy size={14} /> Duplicate
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => onToggleArchive(task.id)} className="gap-2">
+                <Archive size={14} /> {task.isArchived ? 'Unarchive' : 'Archive'}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onDelete(task.id)} className="text-red-600 gap-2">
+                <Trash2 size={14} /> Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

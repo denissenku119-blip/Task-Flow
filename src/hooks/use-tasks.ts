@@ -123,6 +123,22 @@ export const useTasks = () => {
     showSuccess("Task deleted");
   };
 
+  const duplicateTask = (id: string) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) return;
+    saveToHistory();
+    const newTask = {
+      ...task,
+      id: crypto.randomUUID(),
+      title: `${task.title} (Copy)`,
+      createdAt: new Date().toISOString(),
+      lastEdited: new Date().toISOString(),
+      isCompleted: false
+    };
+    setTasks(prev => [newTask, ...prev]);
+    showSuccess("Task duplicated");
+  };
+
   const toggleComplete = (id: string) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
@@ -243,6 +259,7 @@ export const useTasks = () => {
     addTask,
     updateTask,
     deleteTask,
+    duplicateTask,
     toggleComplete,
     togglePin,
     toggleImportant,
