@@ -88,14 +88,6 @@ const PomodoroTimer = () => {
     oscillator.stop(context.currentTime + 0.5);
   };
 
-  const switchMode = useCallback((nextMode: TimerMode) => {
-    setIsActive(false);
-    setMode(nextMode);
-    if (nextMode === 'work') setTimeLeft(workDuration * 60);
-    else if (nextMode === 'shortBreak') setTimeLeft(preset.shortBreak * 60);
-    else setTimeLeft(preset.longBreak * 60);
-  }, [mode, workDuration, preset, workDuration]);
-
   useEffect(() => {
     const totalTime = mode === 'work' ? workDuration * 60 : mode === 'shortBreak' ? preset.shortBreak * 60 : preset.longBreak * 60;
     setTimeLeft(totalTime);
@@ -134,6 +126,14 @@ const PomodoroTimer = () => {
     }
     return () => clearInterval(interval);
   }, [isActive, timeLeft, mode, sessionsCompleted, preset, isMuted, settings.soundEnabled, workDuration, switchMode]);
+
+  const switchMode = useCallback((nextMode: TimerMode) => {
+    setIsActive(false);
+    setMode(nextMode);
+    if (nextMode === 'work') setTimeLeft(workDuration * 60);
+    else if (nextMode === 'shortBreak') setTimeLeft(preset.shortBreak * 60);
+    else setTimeLeft(preset.longBreak * 60);
+  }, [mode, workDuration, preset, workDuration]);
 
   const handleReset = () => {
     setIsActive(false);
