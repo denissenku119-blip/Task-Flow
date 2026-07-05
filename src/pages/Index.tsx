@@ -21,6 +21,10 @@ const Index = () => {
     updateTask, 
     deleteTask, 
     toggleComplete,
+    togglePin,
+    toggleImportant,
+    toggleArchive,
+    duplicateTask,
     tasks
   } = useTasks();
 
@@ -68,7 +72,17 @@ const Index = () => {
                 <div className="space-y-4">
                   {pinnedTasks.length > 0 ? (
                     pinnedTasks.map(task => (
-                      <TaskCard key={task.id} task={task} onToggleComplete={toggleComplete} onEdit={setEditingTask} onDelete={deleteTask} />
+                      <TaskCard 
+                        key={task.id} 
+                        task={task} 
+                        onToggleComplete={toggleComplete}
+                        onEdit={setEditingTask}
+                        onDelete={deleteTask}
+                        onTogglePin={togglePin}
+                        onToggleImportant={toggleImportant}
+                        onToggleArchive={toggleArchive}
+                        onDuplicate={duplicateTask}
+                      />
                     ))
                   ) : (
                     <div className="p-10 border-2 border-dashed border-slate-200 rounded-3xl text-center text-slate-400">
@@ -89,7 +103,17 @@ const Index = () => {
                 <div className="space-y-4">
                   {todayTasks.length > 0 ? (
                     todayTasks.map(task => (
-                      <TaskCard key={task.id} task={task} onToggleComplete={toggleComplete} onEdit={setEditingTask} onDelete={deleteTask} />
+                      <TaskCard 
+                        key={task.id} 
+                        task={task} 
+                        onToggleComplete={toggleComplete}
+                        onEdit={setEditingTask}
+                        onDelete={deleteTask}
+                        onTogglePin={togglePin}
+                        onToggleImportant={toggleImportant}
+                        onToggleArchive={toggleArchive}
+                        onDuplicate={duplicateTask}
+                      />
                     ))
                   ) : (
                     <div className="p-10 border-2 border-dashed border-slate-200 rounded-3xl text-center text-slate-400">
@@ -105,7 +129,7 @@ const Index = () => {
           <div className="lg:col-span-4 space-y-8">
             <PomodoroTimer />
             
-            <Card className="p-8 border-slate-200 rounded-3xl bg-blue-600 text-white shadow-2xl shadow-blue-500/20">
+            <Card className="p-8 border-slate-200 dark:border-slate-800 rounded-3xl bg-blue-600 text-white shadow-2xl shadow-blue-500/20">
               <h3 className="text-xl font-bold mb-4">Productivity Insight</h3>
               <p className="text-blue-100 leading-relaxed mb-6">
                 You're most productive on <strong>Mondays</strong>. You've completed 12 tasks this week, which is 20% higher than last week!
