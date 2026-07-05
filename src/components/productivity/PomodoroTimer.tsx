@@ -88,6 +88,14 @@ const PomodoroTimer = () => {
     oscillator.stop(context.currentTime + 0.5);
   };
 
+  const switchMode = useCallback((nextMode: TimerMode) => {
+    setIsActive(false);
+    setMode(nextMode);
+    if (nextMode === 'work') setTimeLeft(workDuration * 60);
+    else if (nextMode === 'shortBreak') setTimeLeft(preset.shortBreak * 60);
+    else setTimeLeft(preset.longBreak * 60);
+  }, [workDuration, preset]);
+
   useEffect(() => {
     const totalTime = mode === 'work' ? workDuration * 60 : mode === 'shortBreak' ? preset.shortBreak * 60 : preset.longBreak * 60;
     setTimeLeft(totalTime);
@@ -125,15 +133,7 @@ const PomodoroTimer = () => {
       }
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, mode, sessionsCompleted, preset, isMuted, settings.soundEnabled, workDuration, switchMode]);
-
-  const switchMode = useCallback((nextMode: TimerMode) => {
-    setIsActive(false);
-    setMode(nextMode);
-    if (nextMode === 'work') setTimeLeft(workDuration * 60);
-    else if (nextMode === 'shortBreak') setTimeLeft(preset.shortBreak * 60);
-    else setTimeLeft(preset.longBreak * 60);
-  }, [mode, workDuration, preset, workDuration]);
+  }, [isActive, timeLeft, mode, sessionsCompleted, preset, settings.soundEnabled, workDuration, switchMode]);
 
   const handleReset = () => {
     setIsActive(false);
@@ -249,54 +249,55 @@ const PomodoroTimer = () => {
             </div>
           </div>
 
-        <div className="flex gap-3">
-          <Button 
-            onClick={() => setIsActive(!isActive)}
-            className={cn(
-              "flex-[2] h-16 rounded-2xl text-lg font-black transition-all shadow-xl active:scale-95",
-              isActive 
-                ? "bg-slate-100 hover:bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700" 
-                : mode === 'work' 
-                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20" 
-                  : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20"
-            )}
-          >
-            {isActive ? <Pause className="mr-2 fill-current" /> : <Play className="mr-2 fill-current" />}
-            {isActive ? 'Pause' : 'Start Session'}
-          </Button>
-          <Button 
-            variant="outline" 
-            size="icon" 
-            onClick={handleSkip}
-            className="w-16 h-16 rounded-2xl border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95"
-          >
-            <SkipForward size={24} />
-          </Button>
-        </div>
-
-        <div className="mt-8 flex items-center justify-center gap-6">
-          <div className="flex flex-col items-center">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Sessions</span>
-            <div className="flex gap-1.5">
-              {Array.from({ length: preset.sessionsBeforeLong }).map((_, i) => (
-                <div 
-                  key={i} 
-                  className={cn(
-                    "w-2 h-2 rounded-full transition-all duration-500",
-                    i < (sessionsCompleted % preset.sessionsBeforeLong) 
-                      ? "bg-blue-600 scale-110" 
-                      : "bg-slate-200 dark:bg-slate-800"
-                  )} 
-                />
-              ))}
-            </div>
+          <div className="flex gap-3">
+            <Button 
+              onClick={() => setIsActive(!isActive)}
+              className={cn(
+                "flex-[2] h-16 rounded-2xl text-lg font-black transition-all shadow-xl active:scale-95",
+                isActive 
+                  ? "bg-slate-100 hover:bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700" 
+                  : mode === 'work' 
+                    ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20" 
+                    : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20"
+              )}
+            >
+              {isActive ? <Pause className="mr-2 fill-current" /> : <Play className="mr-2 fill-current" />}
+              {isActive ? 'Pause' : 'Start Session'}
+            </Button>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              onClick={handleSkip}
+              className="w-16 h-16 rounded-2xl border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95"
+            >
+              <SkipForward size={24} />
+            </Button>
           </div>
-          <div className="w-px h-8 bg-slate-100 dark:bg-slate-800" />
-          <div className="flex flex-col items-center">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total</span>
-            <div className="flex items-center gap-1 text-slate-900 dark:text-white font-black">
-              <Trophy size={14} className="text-amber-500" />
-              {sessionsCompleted}
+
+          <div className="mt-8 flex items-center justify-center gap-6">
+            <div className="flex flex-col items-center">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Sessions</span>
+              <div className="flex gap-1.5">
+                {Array.from({ length: preset.sessionsBeforeLong }).map((_, i) => (
+                  <div 
+                    key={i} 
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-all duration-500",
+                      i < (sessionsCompleted % preset.sessionsBeforeLong) 
+                        ? "bg-blue-600 scale-110" 
+                        : "bg-slate-200 dark:bg-slate-800"
+                    )} 
+                  />
+                ))}
+              </div>
+            </div>
+            <div className="w-px h-8 bg-slate-100 dark:bg-slate-800" />
+            <div className="flex flex-col items-center">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total</span>
+              <div className="flex items-center gap-1 text-slate-900 dark:text-white font-black">
+                <Trophy size={14} className="text-amber-500" />
+                {sessionsCompleted}
+              </div>
             </div>
           </div>
         </div>
