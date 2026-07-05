@@ -94,7 +94,7 @@ export const useTasks = () => {
       priority: taskData.priority || 'Medium',
       category: taskData.category || 'Personal',
       isCompleted: false,
-      isPinned: taskData.isPinned || false,
+      isPinned: taskData.isPinned || false || false,
       isImportant: taskData.isImportant || false,
       isArchived: false,
       reminderEnabled: taskData.reminderEnabled || false,
