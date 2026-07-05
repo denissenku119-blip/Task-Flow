@@ -236,28 +236,16 @@ export const useTasks = () => {
   }, [tasks, searchQuery, filter, categoryFilter, priorityFilter, sortBy]);
 
   const stats = useMemo(() => {
-    const completedTasks = tasks.filter(t => t.isCompleted && !t.isArchived);
-    const totalCompleted = completedTasks.length;
-    const totalActive = tasks.filter(t => !t.isArchived).length;
-    const percentage = totalActive > 0 ? Math.round((totalCompleted / totalActive) * 100) : 0;
+    const active = tasks.filter(t => !t.isArchived);
+    const completed = active.filter(t => t.isCompleted).length;
+    const total = active.length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
     
     const today = startOfDay(new Date());
-    const todayCompleted = completedTasks.filter(t => isSameDay(parseISO(t.dueDate), today)).length;
-    const todayActive = tasks.filter(t => !t.isArchived && isSameDay(parseISO(t.dueDate), today)).length;
-    const overdueTasks = tasks.filter(t => !t.isCompleted && isBefore(parseISO(t.dueDate), today) && !t.isArchived).length;
+    const todayTasks = active.filter(t => isSameDay(parseISO(t.dueDate), today));
+    const overdueTasks = active.filter(t => !t.isCompleted && isBefore(parseISO(t.dueDate), today));
 
-    // Calculate productivity insights
-    const productivityData = {
-      completedTasks,
-      totalCompleted,
-      totalActive,
-      percentage,
-      todayCompleted,
-      todayActive,
-      overdueTasks
-    };
-
-    return productivityData;
+    return { total, completed, pending: total - completed, percentage, todayTasks, overdueTasks };
   }, [tasks]);
 
   return {
