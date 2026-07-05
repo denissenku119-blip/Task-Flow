@@ -88,6 +88,14 @@ const PomodoroTimer = () => {
     oscillator.stop(context.currentTime + 0.5);
   };
 
+  const switchMode = useCallback((nextMode: TimerMode) => {
+    setIsActive(false);
+    setMode(nextMode);
+    if (nextMode === 'work') setTimeLeft(workDuration * 60);
+    else if (nextMode === 'shortBreak') setTimeLeft(preset.shortBreak * 60);
+    else setTimeLeft(preset.longBreak * 60);
+  }, [mode, workDuration, preset, workDuration]);
+
   useEffect(() => {
     const totalTime = mode === 'work' ? workDuration * 60 : mode === 'shortBreak' ? preset.shortBreak * 60 : preset.longBreak * 60;
     setTimeLeft(totalTime);
@@ -126,14 +134,6 @@ const PomodoroTimer = () => {
     }
     return () => clearInterval(interval);
   }, [isActive, timeLeft, mode, sessionsCompleted, preset, isMuted, settings.soundEnabled, workDuration, switchMode]);
-
-  const switchMode = useCallback((nextMode: TimerMode) => {
-    setIsActive(false);
-    setMode(nextMode);
-    if (nextMode === 'work') setTimeLeft(workDuration * 60);
-    else if (nextMode === 'shortBreak') setTimeLeft(preset.shortBreak * 60);
-    else setTimeLeft(preset.longBreak * 60);
-  }, [mode, workDuration, preset, workDuration]);
 
   const handleReset = () => {
     setIsActive(false);
@@ -233,7 +233,7 @@ const PomodoroTimer = () => {
                   key={mode}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit {{ opacity: 0, y: -10 }}
+                  exit={{ opacity: 0, y: -10 }}
                   className={cn(
                     "flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-2",
                     mode === 'work' ? "bg-blue-50 text-blue-600 dark:bg-blue-900/30" : "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30"
