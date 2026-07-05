@@ -20,6 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { useTasks } from '@/hooks/use-tasks';
+
 type TimerMode = 'work' | 'shortBreak' | 'longBreak';
 
 interface TimerPreset {
@@ -39,23 +41,57 @@ const PRESETS: TimerPreset[] = [
 ];
 
 const PomodoroTimer = () => {
+  const { settings } = useTasks();
   const [preset, setPreset] = useState<TimerPreset>(PRESETS[0]);
   const [mode, setMode] = useState<TimerMode>('work');
-  const [timeLeft, setTimeLeft] = useState(preset.work * 60);
+  const [timeLeft, setTimeLeft] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [sessionsCompleted, setSessionsCompleted] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
 
-  const totalTime = mode === 'work' ? preset.work * 60 : mode === 'shortBreak' ? preset.shortBreak * 60 : preset.longBreak * 60;
+  const workDuration = settings.workDuration || 25;
+  const totalTime = mode === 'work' ? workDuration * 60 : mode === 'shortBreak' ? preset.shortBreak * 60 : preset.longBreak * 60;
   const progress = (timeLeft / totalTime) * 100;
 
-  const switchMode = useCallback((nextMode: TimerMode) => {
-    setIsActive(false);
-    setMode(nextMode);
-    if (nextMode === 'work') setTimeLeft(preset.work * 60);
-    else if (nextMode === 'shortBreak') setTimeLeft(preset.shortBreak * 60);
-    else setTimeLeft(preset.longBreak * 60);
-  }, [preset]);
+  const playSound = (sound: string) => {
+    if (!settings.soundEnabled) return;
+    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+    gainNode.gain.value = settings.volume / 100;
+    oscillator.type = 'sine';
+    switch (sound) {
+      case 'Classic Bell':
+        oscillator.frequency.value = 880;
+        break;
+      case 'Digital Beep':
+        oscillator.frequency.value = 1000;
+        break;
+      case 'Soft Chime':
+        oscillator.frequency.value = 523;
+        break;
+      case 'Gentle Piano':
+        oscillator.frequency.value = 392;
+        break;
+      case 'Zen Gong':
+        oscillator.frequency.value = 261;
+        break;
+      case 'Notification Ding':
+        oscillator.frequency.value = 1568;
+        break;
+      case 'No Sound':
+        return;
+    }
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.5);
+  };
+
+  useEffect(() => {
+    const totalTime = mode === 'work' ? workDuration * 60 : mode === 'shortBreak' ? preset.shortBreak * 60 : preset.longBreak * 60;
+    setTimeLeft(totalTime);
+  }, [mode, workDuration, preset.shortBreak, preset.longBreak]);
 
   useEffect(() => {
     let interval: any;
@@ -63,10 +99,17 @@ const PomodoroTimer = () => {
       interval = setInterval(() => setTimeLeft(t => t - 1), 1000);
     } else if (timeLeft === 0) {
       setIsActive(false);
-      if (!isMuted) {
-        // Play sound logic would go here
+      if (settings.soundEnabled) {
+        let soundToPlay: string = 'workSound';
+        if (mode === 'work') {
+          soundToPlay = settings.workSound;
+        } else if (mode === 'shortBreak') {
+          soundToPlay = settings.shortBreakSound;
+        } else if (mode === 'longBreak') {
+          soundToPlay = settings.longBreakSound;
+        }
+        playSound(soundToPlay);
       }
-      
       if (mode === 'work') {
         const newCount = sessionsCompleted + 1;
         setSessionsCompleted(newCount);
@@ -82,17 +125,19 @@ const PomodoroTimer = () => {
       }
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, mode, sessionsCompleted, preset, isMuted, switchMode]);
+  }, [isActive, timeLeft, mode, sessionsCompleted, preset, isMuted, settings.soundEnabled, workDuration, switchMode]);
 
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
+  const switchMode = useCallback((nextMode: TimerMode) => {
+    setIsActive(false);
+    setMode(nextMode);
+    if (nextMode === 'work') setTimeLeft(workDuration * 60);
+    else if (nextMode === 'shortBreak') setTimeLeft(preset.shortBreak * 60);
+    else setTimeLeft(preset.longBreak * 60);
+  }, [mode, workDuration, preset, workDuration]);
 
   const handleReset = () => {
     setIsActive(false);
-    setTimeLeft(totalTime);
+    setTimeLeft(workDuration * 60);
   };
 
   const handleSkip = () => {
@@ -103,14 +148,15 @@ const PomodoroTimer = () => {
     }
   };
 
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
   return (
     <Card className="p-8 border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white dark:bg-slate-900 shadow-2xl shadow-blue-500/5 relative overflow-hidden">
       {/* Background Glow */}
-      <div className={cn(
-        "absolute -top-24 -right-24 w-64 h-64 rounded-full blur-[100px] opacity-20 transition-colors duration-700",
-        mode === 'work' ? "bg-blue-500" : "bg-emerald-500"
-      )} />
-
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-8">
           <DropdownMenu>
@@ -150,7 +196,7 @@ const PomodoroTimer = () => {
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-center mb-10">
+        <div className="flex flex-col items-center mb-10">
           {/* Circular Progress */}
           <div className="relative w-64 h-64 flex items-center justify-center">
             <svg className="w-full h-full -rotate-90 transform">
@@ -187,7 +233,7 @@ const PomodoroTimer = () => {
                   key={mode}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
+                  exit {{ opacity: 0, y: -10 }}
                   className={cn(
                     "flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-2",
                     mode === 'work' ? "bg-blue-50 text-blue-600 dark:bg-blue-900/30" : "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30"
@@ -202,7 +248,6 @@ const PomodoroTimer = () => {
               </h2>
             </div>
           </div>
-        </div>
 
         <div className="flex gap-3">
           <Button 

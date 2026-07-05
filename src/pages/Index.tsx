@@ -17,6 +17,7 @@ import { Card } from '@/components/ui/card';
 const Index = () => {
   const { 
     stats, 
+    tasks,
     addTask, 
     updateTask, 
     deleteTask, 
@@ -25,11 +26,22 @@ const Index = () => {
     toggleImportant,
     toggleArchive,
     duplicateTask,
-    tasks
   } = useTasks();
 
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [editingTask, setEditingTask] = React.useState<Task | null>(null);
+
+  const completedTasks = tasks.filter(t => t.isCompleted);
+  const completedCount = completedTasks.length;
+  const completionRate = stats.percentage;
+
+  const dayCounts: Record<string, number> = {};
+  completedTasks.forEach(t => {
+    const date = new Date(t.dueDate);
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'long' });
+    dayCounts[dayName] = (dayCounts[dayName] || 0) + 1;
+  });
+  const mostProductiveDay = Object.entries(dayCounts).reduce(([dayA, countA], [dayB, countB]) => countA > countB ? [dayA, countA] : [dayB, countB])[0];
 
   const pinnedTasks = tasks.filter(t => t.isPinned && !t.isArchived).slice(0, 3);
   const todayTasks = stats.todayTasks.slice(0, 3);
@@ -131,9 +143,16 @@ const Index = () => {
             
             <Card className="p-8 border-slate-200 dark:border-slate-800 rounded-3xl bg-blue-600 text-white shadow-2xl shadow-blue-500/20">
               <h3 className="text-xl font-bold mb-4">Productivity Insight</h3>
-              <p className="text-blue-100 leading-relaxed mb-6">
-                You're most productive on <strong>Mondays</strong>. You've completed 12 tasks this week, which is 20% higher than last week!
-              </p>
+              {completedCount === 0 ? (
+                <p className="text-blue-100 leading-relaxed mb-6">
+                  Not enough activity yet. Complete more tasks to unlock personalized insights.
+                </p>
+              ) : (
+                <p className="text-blue-100 leading-relaxed mb-6">
+                  You have completed {completedCount} tasks. Completion rate: {completionRate}%.
+                  {mostProductiveDay && <span className="font-bold">Most productive day: {mostProductiveDay}</span>}
+                </p>
+              )}
               <div className="space-y-2">
                 <div className="flex justify-between text-sm font-bold">
                   <span>Weekly Goal</span>

@@ -13,7 +13,13 @@ const DEFAULT_SETTINGS: AppSettings = {
   animationsEnabled: true,
   remindersEnabled: true,
   defaultFilter: 'All',
-  defaultSort: 'Newest'
+  defaultSort: 'Newest',
+  workDuration: 25,
+  soundEnabled: true,
+  volume: 100,
+  workSound: 'Classic Bell',
+  shortBreakSound: 'Digital Beep',
+  longBreakSound: 'Soft Chime',
 };
 
 export const useTasks = () => {
@@ -94,7 +100,7 @@ export const useTasks = () => {
       priority: taskData.priority || 'Medium',
       category: taskData.category || 'Personal',
       isCompleted: false,
-      isPinned: taskData.isPinned || false || false,
+      isPinned: taskData.isPinned || false,
       isImportant: taskData.isImportant || false,
       isArchived: false,
       reminderEnabled: taskData.reminderEnabled || false,

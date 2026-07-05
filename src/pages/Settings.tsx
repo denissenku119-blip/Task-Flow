@@ -41,6 +41,8 @@ import {
 } from "@/components/ui/select";
 import { showSuccess, showError } from '@/utils/toast';
 import { SortOption, FilterOption } from '@/types/task';
+import { Input } from "@/components/ui/input";
+import { cn } from '@/lib/utils';
 
 const Settings = () => {
   const { theme, setTheme } = useTheme();
@@ -109,10 +111,7 @@ const Settings = () => {
 
               <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
                 <div className="space-y-0.5">
-                  <Label className="text-base flex items-center gap-2">
-                    <Zap size={16} className="text-amber-500" />
-                    Enable Animations
-                  </Label>
+                  <Label className="text-base">Enable Animations</Label>
                   <p className="text-sm text-slate-500 dark:text-slate-400">Smooth transitions and micro-interactions.</p>
                 </div>
                 <Switch 
@@ -146,7 +145,10 @@ const Settings = () => {
                     <SelectItem value="All">All Tasks</SelectItem>
                     <SelectItem value="Today">Today</SelectItem>
                     <SelectItem value="Upcoming">Upcoming</SelectItem>
+                    <SelectItem value="Completed">Completed</SelectItem>
                     <SelectItem value="Pinned">Pinned</SelectItem>
+                    <SelectItem value="Important">Important</SelectItem>
+                    <SelectItem value="Archived">Archived</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -166,24 +168,124 @@ const Settings = () => {
                   <SelectContent className="rounded-xl">
                     <SelectItem value="Newest">Newest First</SelectItem>
                     <SelectItem value="Oldest">Oldest First</SelectItem>
+                    <SelectItem value="Alphabetical">Alphabetical</SelectItem>
                     <SelectItem value="Due Date">Due Date</SelectItem>
                     <SelectItem value="Priority">Priority</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
+              {/* Work Session Duration */}
               <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
                 <div className="space-y-0.5">
-                  <Label className="text-base flex items-center gap-2">
-                    <Bell size={16} className="text-blue-500" />
-                    Enable Reminders
-                  </Label>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Receive browser notifications for tasks.</p>
+                  <Label className="text-base">Work Session Duration (minutes)</Label>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Set the length of your work session.</p>
                 </div>
-                <Switch 
-                  checked={settings.remindersEnabled} 
-                  onCheckedChange={(val) => updateSettings({ remindersEnabled: val })} 
-                />
+                <div className="flex items-center">
+                  <Input 
+                    type="number" 
+                    min={1} 
+                    max={999} 
+                    value={settings.workDuration} 
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      if (!Number.isNaN(val)) {
+                        updateSettings({ workDuration: val });
+                      }
+                    }} 
+                    className="rounded-xl border-slate-200 dark:border-slate-800 focus:ring-slate-500"
+                  />
+                </div>
+              </div>
+
+              {/* Timer Sounds */}
+              <div className="p-6 border-slate-200 dark:border-slate-800 rounded-2xl space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label className="text-base">Timer Sounds</Label>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Configure sounds for timer notifications.</p>
+                  </div>
+                  <Switch checked={settings.soundEnabled} onCheckedChange={(val) => updateSettings({ soundEnabled: val })} className="w-16 h-8" />
+                </div>
+                <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                  <div className="space-y-0.5">
+                    <Label className="text-base">Volume</Label>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Adjust notification volume.</p>
+                  </div>
+                  <div className="flex items-center">
+                    <input 
+                      type="range" 
+                      min={0} 
+                      max={100} 
+                      value={settings.volume} 
+                      onChange={(e) => updateSettings({ volume: Number(e.target.value) })} 
+                      className="w-32 h-2 rounded-full appearance-none accent-blue-500 dark:accent-blue-400 focus:ring-2 focus:ring-blue-300"
+                    />
+                    <span className="ml-2 text-xs font-medium text-slate-500 dark:text-slate-400">{settings.volume}%</span>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex flex-col items-center">
+                    <Label className="text-base">Work Sound</Label>
+                    <Select 
+                      value={settings.workSound} 
+                      onValueChange={(val) => updateSettings({ workSound: val as string })}
+                    >
+                      <SelectTrigger className="w-48 rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectItem value="Classic Bell">Classic Bell</SelectItem>
+                        <SelectItem value="Digital Beep">Digital Beep</SelectItem>
+                        <SelectItem value="Soft Chime">Soft Chime</SelectItem>
+                        <SelectItem value="Gentle Piano">Gentle Piano</SelectItem>
+                        <SelectItem value="Zen Gong">Zen Gong</SelectItem>
+                        <SelectItem value="Notification Ding">Notification Ding</SelectItem>
+                        <SelectItem value="No Sound">No Sound</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <Label className="text-base">Short Break Sound</Label>
+                    <Select 
+                      value={settings.shortBreakSound} 
+                      onValueChange={(val) => updateSettings({ shortBreakSound: val as string })}
+                    >
+                      <SelectTrigger className="w-48 rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectItem value="Classic Bell">Classic Bell</SelectItem>
+                        <SelectItem value="Digital Beep">Digital Beep</SelectItem>
+                        <SelectItem value="Soft Chime">Soft Chime</SelectItem>
+                        <SelectItem value="Gentle Piano">Gentle Piano</SelectItem>
+                        <SelectItem value="Zen Gong">Zen Gong</SelectItem>
+                        <SelectItem value="Notification Ding">Notification Ding</SelectItem>
+                        <SelectItem value="No Sound">No Sound</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <Label className="text-base">Long Break Sound</Label>
+                    <Select 
+                      value={settings.longBreakSound} 
+                      onValueChange={(val) => updateSettings({ longBreakSound: val as string })}
+                    >
+                      <SelectTrigger className="w-48 rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-xl">
+                        <SelectItem value="Classic Bell">Classic Bell</SelectItem>
+                        <SelectItem value="Digital Beep">Digital Beep</SelectItem>
+                        <SelectItem value="Soft Chime">Soft Chime</SelectItem>
+                        <SelectItem value="Gentle Piano">Gentle Piano</SelectItem>
+                        <SelectItem value="Zen Gong">Zen Gong</SelectItem>
+                        <SelectItem value="Notification Ding">Notification Ding</SelectItem>
+                        <SelectItem value="No Sound">No Sound</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
             </Card>
           </section>
@@ -225,7 +327,7 @@ const Settings = () => {
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-base text-red-600">Reset All Data</Label>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Permanently delete all tasks and settings.</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Permanently delete all tasks and reset the application to its default state.</p>
                 </div>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
