@@ -53,41 +53,6 @@ const PomodoroTimer = () => {
   const totalTime = mode === 'work' ? workDuration * 60 : mode === 'shortBreak' ? preset.shortBreak * 60 : preset.longBreak * 60;
   const progress = (timeLeft / totalTime) * 100;
 
-  const playSound = (sound: string) => {
-    if (!settings.soundEnabled) return;
-    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
-    gainNode.gain.value = settings.volume / 100;
-    oscillator.type = 'sine';
-    switch (sound) {
-      case 'Classic Bell':
-        oscillator.frequency.value = 880;
-        break;
-      case 'Digital Beep':
-        oscillator.frequency.value = 1000;
-        break;
-      case 'Soft Chime':
-        oscillator.frequency.value = 523;
-        break;
-      case 'Gentle Piano':
-        oscillator.frequency.value = 392;
-        break;
-      case 'Zen Gong':
-        oscillator.frequency.value = 261;
-        break;
-      case 'Notification Ding':
-        oscillator.frequency.value = 1568;
-        break;
-      case 'No Sound':
-        return;
-    }
-    oscillator.start();
-    oscillator.stop(context.currentTime + 0.5);
-  };
-
   const switchMode = useCallback((nextMode: TimerMode) => {
     setIsActive(false);
     setMode(nextMode);
@@ -107,17 +72,6 @@ const PomodoroTimer = () => {
       interval = setInterval(() => setTimeLeft(t => t - 1), 1000);
     } else if (timeLeft === 0) {
       setIsActive(false);
-      if (settings.soundEnabled) {
-        let soundToPlay: string = 'workSound';
-        if (mode === 'work') {
-          soundToPlay = settings.workSound;
-        } else if (mode === 'shortBreak') {
-          soundToPlay = settings.shortBreakSound;
-        } else if (mode === 'longBreak') {
-          soundToPlay = settings.longBreakSound;
-        }
-        playSound(soundToPlay);
-      }
       if (mode === 'work') {
         const newCount = sessionsCompleted + 1;
         setSessionsCompleted(newCount);
@@ -133,7 +87,7 @@ const PomodoroTimer = () => {
       }
     }
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, mode, sessionsCompleted, preset, settings.soundEnabled, workDuration, switchMode]);
+  }, [isActive, timeLeft, mode, sessionsCompleted, preset, workDuration, switchMode]);
 
   const handleReset = () => {
     setIsActive(false);
@@ -156,7 +110,6 @@ const PomodoroTimer = () => {
 
   return (
     <Card className="p-8 border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white dark:bg-slate-900 shadow-2xl shadow-blue-500/5 relative overflow-hidden">
-      {/* Background Glow */}
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-8">
           <DropdownMenu>
@@ -197,7 +150,6 @@ const PomodoroTimer = () => {
         </div>
 
         <div className="flex flex-col items-center mb-10">
-          {/* Circular Progress */}
           <div className="relative w-64 h-64 flex items-center justify-center">
             <svg className="w-full h-full -rotate-90 transform">
               <circle
@@ -268,7 +220,7 @@ const PomodoroTimer = () => {
               variant="outline" 
               size="icon" 
               onClick={handleSkip}
-              className="w-16 h-16 rounded-2xl border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95"
+              className="w-16 h-16 rounded-2xl border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-8000 active:scale-95"
             >
               <SkipForward size={24} />
             </Button>
