@@ -53,27 +53,27 @@ const StatsGrid = ({ stats }: StatsGridProps) => {
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {items.map((item, index) => (
         <motion.div
           key={item.label}
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05, duration: 0.2 }}
+          transition={{ delay: index * 0.1 }}
         >
-          <Card className="p-4 border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow rounded-2xl">
-            <div className="flex items-center justify-between mb-3">
-              <div className={`p-2.5 rounded-xl ${item.bg} ${item.color}`}>
-                <item.icon size={20} />
+          <Card className="p-6 border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow rounded-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-xl ${item.bg} ${item.color}`}>
+                <item.icon size={24} />
               </div>
             </div>
             <div>
-              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{item.label}</p>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">{item.value}</h3>
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{item.label}</p>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{item.value}</h3>
             </div>
             {item.label === 'Completion' && (
-              <div className="mt-3">
-                <Progress value={stats.percentage} className="h-1.5 bg-slate-100 dark:bg-slate-800" />
+              <div className="mt-4">
+                <Progress value={stats.percentage} className="h-2 bg-slate-100 dark:bg-slate-800" />
               </div>
             )}
           </Card>
