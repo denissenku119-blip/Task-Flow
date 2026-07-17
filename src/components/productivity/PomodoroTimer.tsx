@@ -27,7 +27,7 @@ interface TimerMode {
  shortBreak: number;
  longBreak: number;
  sessionsBeforeLong: number;
- custom: { hours: number; minutes: number; seconds: number; }
+ custom?: { hours: number; minutes: number; seconds: number; }
 }
 
 interface TimerPreset {
@@ -82,7 +82,6 @@ const PomodoroTimer = () => {
  const [isActive, setIsActive] = useState(false);
  const [sessionsCompleted, setSessionsCompleted] = useState(0);
  const [isMuted, setIsMuted] = useState(false);
- const [customDuration, setCustomDuration] = useState({ hours: 0, minutes: 0, seconds: 0 });
  const [inputValues, setInputValues] = useState({ hours: 0, minutes: 0, seconds: 0 });
 
  const workDuration = settings.workDuration || 25;
@@ -157,7 +156,7 @@ const PomodoroTimer = () => {
  };
 
  const handleInputChange = (field: keyof typeof inputValues, value: string) => {
- setInputValues(prev => ({ ...prev, [field]: Math.max(0, Math.min(parseInt(value), 23) } as any));
+ setInputValues(prev => ({ ...prev, [field]: Math.max(0, Math.min(parseInt(value) || 0, 23)) } as any));
  };
 
  const handleCustomSubmit = () => {
@@ -183,7 +182,7 @@ const PomodoroTimer = () => {
  key={p.id} 
  onClick={() => {
  setPreset(p);
- setMode(p.id === 'custom' ? 'custom' : p.id);
+ setMode(p.id === 'custom' ? 'custom' : p.id as 'work' | 'shortBreak' | 'longBreak');
  setTimeLeft(p.id === 'custom' ? 0 : (p.id === 'work' ? workDuration * 60 : (p.id === 'shortBreak' ? preset.mode.shortBreak * 60 : preset.mode.longBreak * 60)));
  setIsActive(false);
  }}
@@ -309,63 +308,8 @@ const PomodoroTimer = () => {
  </div>
  </div>
  </div>
-
- {mode === 'custom' && (
- <div className="mt-6 flex flex-col items-center gap-4">
- <div className="flex gap-2">
- <div className="flex flex-col items-center gap-1">
- <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Hours</span>
- <input
- type="number"
- min="0"
- max="23"
- value={inputValues.hours}
- onChange={(e) => handleInputChange('hours', e.target.value)}
- className="w-10 h-6 rounded-md border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
- />
  </div>
- <div className="flex flex-col items-center gap-1">
- <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Minutes</span>
- <input
- type="number"
- min="0"
- max="59"
- value={inputValues.minutes}
- onChange={(e) => handleInputChange('minutes', e.target.value)}
- className="w-10 h-6 rounded-md border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
- />
- </div>
- <div className="flex flex-col items-center gap-1">
- <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Seconds</span>
- <input
- type="number"
- min="0"
- max="59"
- value={inputValues.seconds}
- onChange={(e) => handleInputChange('seconds', e.target.value)}
- className="w-10 h-6 rounded-md border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
- />
- </div>
- </div>
- <div className="flex gap-2">
- <Button
- onClick={() => {
- setInputValues({ hours: 0, minutes: 0, seconds: 0 });
- setTimeLeft(0);
- }}>
- <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Reset</span>
- </Button>
- <Button
- onClick={handleCustomSubmit}
- className="px-3 py-1 rounded-md bg-slate-600 text-sm text-white hover:bg-slate-700 transition-colors"
- >
- <span className="text-sm font-medium">Set</span>
- </Button>
- </div>
- </div>
- )}
-
-</Card>
+ </Card>
  );
 };
 
