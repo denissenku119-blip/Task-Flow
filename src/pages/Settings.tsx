@@ -31,7 +31,7 @@ import { useTasks } from "@/hooks/use-tasks";
 import { showSuccess, showError } from "@/utils/toast";
 import { FilterOption, SortOption } from "@/types/task";
 import {
- Sun, Moon, Monitor, Settings2, ShieldCheck, Download, Upload, Trash2, Timer
+ Sun, Moon, Monitor, Settings2, ShieldCheck, Download, Upload, Trash2, Timer, Info
 } from 'lucide-react';
 
 const Settings = () => {
@@ -127,9 +127,8 @@ const Settings = () => {
          <Select
           value={settings.defaultFilter}
           onValueChange={(val) => updateSettings({ defaultFilter: val as FilterOption })}
-          className="w-[120px] rounded-md"
          >
-          <SelectTrigger className="rounded-md h-9">
+          <SelectTrigger className="w-[120px] rounded-md h-9">
            <SelectValue className="text-sm" />
           </SelectTrigger>
           <SelectContent className="rounded-md">
@@ -152,9 +151,8 @@ const Settings = () => {
          <Select
           value={settings.defaultSort}
           onValueChange={(val) => updateSettings({ defaultSort: val as SortOption })}
-          className="w-[120px] rounded-md"
          >
-          <SelectTrigger className="rounded-md h-9">
+          <SelectTrigger className="w-[120px] rounded-md h-9">
            <SelectValue className="text-sm" />
           </SelectTrigger>
           <SelectContent className="rounded-md">
@@ -207,49 +205,49 @@ const Settings = () => {
         <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
          <div className="flex flex-col items-center">
           <Label className="text-xs">Work Sound</Label>
-          <Select className="w-[100px] rounded-md">
-           <SelectTrigger className="rounded-md h-8">
+          <Select>
+           <SelectTrigger className="w-[100px] rounded-md h-8">
             <SelectValue className="text-xs" />
            </SelectTrigger>
            <SelectContent className="rounded-md">
-            <SelectItem className="text-xs">Classic Bell</SelectItem>
-            <SelectItem className="text-xs">Digital Beep</SelectItem>
-            <SelectItem className="text-xs">Soft Chime</SelectItem>
-            <SelectItem className="text-xs">Gentle Piano</SelectItem>
-            <SelectItem className="text-xs">Zen Gong</SelectItem>
-            <SelectItem className="text-xs">No Sound</SelectItem>
+            <SelectItem value="Classic Bell" className="text-xs">Classic Bell</SelectItem>
+            <SelectItem value="Digital Beep" className="text-xs">Digital Beep</SelectItem>
+            <SelectItem value="Soft Chime" className="text-xs">Soft Chime</SelectItem>
+            <SelectItem value="Gentle Piano" className="text-xs">Gentle Piano</SelectItem>
+            <SelectItem value="Zen Gong" className="text-xs">Zen Gong</SelectItem>
+            <SelectItem value="No Sound" className="text-xs">No Sound</SelectItem>
            </SelectContent>
           </Select>
          </div>
          <div className="flex flex-col items-center">
           <Label className="text-xs">Short Break Sound</Label>
-          <Select className="w-[100px] rounded-md">
-           <SelectTrigger className="rounded-md h-8">
+          <Select>
+           <SelectTrigger className="w-[100px] rounded-md h-8">
             <SelectValue className="text-xs" />
            </SelectTrigger>
            <SelectContent className="rounded-md">
-            <SelectItem className="text-xs">Classic Bell</SelectItem>
-            <SelectItem className="text-xs">Digital Beep</SelectItem>
-            <SelectItem className="text-xs">Soft Chime</SelectItem>
-            <SelectItem className="text-xs">Gentle Piano</SelectItem>
-            <SelectItem className="text-xs">Zen Gong</SelectItem>
-            <SelectItem className="text-xs">No Sound</SelectItem>
+            <SelectItem value="Classic Bell" className="text-xs">Classic Bell</SelectItem>
+            <SelectItem value="Digital Beep" className="text-xs">Digital Beep</SelectItem>
+            <SelectItem value="Soft Chime" className="text-xs">Soft Chime</SelectItem>
+            <SelectItem value="Gentle Piano" className="text-xs">Gentle Piano</SelectItem>
+            <SelectItem value="Zen Gong" className="text-xs">Zen Gong</SelectItem>
+            <SelectItem value="No Sound" className="text-xs">No Sound</SelectItem>
            </SelectContent>
           </Select>
          </div>
          <div className="flex flex-col items-center">
           <Label className="text-xs">Long Break Sound</Label>
-          <Select className="w-[100px] rounded-md">
-           <SelectTrigger className="rounded-md h-8">
+          <Select>
+           <SelectTrigger className="w-[100px] rounded-md h-8">
             <SelectValue className="text-xs" />
            </SelectTrigger>
            <SelectContent className="rounded-md">
-            <SelectItem className="text-xs">Classic Bell</SelectItem>
-            <SelectItem className="text-xs">Digital Beep</SelectItem>
-            <SelectItem className="text-xs">Soft Chime</SelectItem>
-            <SelectItem className="text-xs">Gentle Piano</SelectItem>
-            <SelectItem className="text-xs">Zen Gong</SelectItem>
-            <SelectItem className="text-xs">No Sound</SelectItem>
+            <SelectItem value="Classic Bell" className="text-xs">Classic Bell</SelectItem>
+            <SelectItem value="Digital Beep" className="text-xs">Digital Beep</SelectItem>
+            <SelectItem value="Soft Chime" className="text-xs">Soft Chime</SelectItem>
+            <SelectItem value="Gentle Piano" className="text-xs">Gentle Piano</SelectItem>
+            <SelectItem value="Zen Gong" className="text-xs">Zen Gong</SelectItem>
+            <SelectItem value="No Sound" className="text-xs">No Sound</SelectItem>
            </SelectContent>
           </Select>
          </div>
