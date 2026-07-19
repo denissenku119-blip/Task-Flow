@@ -9,6 +9,9 @@ import Tasks from "./pages/Tasks";
 import Calendar from "./pages/Calendar";
 import Settings from "./pages/Settings";
 import Support from "./pages/Support";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import OpenSourceLicenses from "./pages/OpenSourceLicenses";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +29,9 @@ const App = () => (
             <Route path="/calendar" element={<Calendar />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/support" element={<Support />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/licenses" element={<OpenSourceLicenses />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

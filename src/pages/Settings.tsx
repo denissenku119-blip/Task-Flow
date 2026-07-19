@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,7 @@ import { APP_VERSION } from '@/lib/appVersion';
 const Settings = () => {
  const { theme, setTheme } = useTheme();
  const { settings, updateSettings, resetData } = useTasks();
+ const navigate = useNavigate();
  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
  // Feedback form state
@@ -384,7 +386,7 @@ const Settings = () => {
           <Button
            variant="outline"
            size="sm"
-           onClick={() => window.location.href = '/support'}
+           onClick={() => navigate('/support')}
            className="rounded-md gap-1 text-sm"
           >
            View Support
@@ -460,7 +462,7 @@ const Settings = () => {
           <Button
            variant="outline"
            size="sm"
-           onClick={() => window.location.href = '/privacy-policy'}
+           onClick={() => navigate('/privacy')}
            className="rounded-md gap-1 text-sm"
           >
            View
@@ -491,7 +493,7 @@ const Settings = () => {
           <Button
            variant="outline"
            size="sm"
-           onClick={() => window.location.href = '/terms-of-service'}
+           onClick={() => navigate('/terms')}
            className="rounded-md gap-1 text-sm"
           >
            View
@@ -545,7 +547,7 @@ const Settings = () => {
           <Button
            variant="outline"
            size="sm"
-           onClick={() => window.location.href = '/open-source-licenses'}
+           onClick={() => navigate('/licenses')}
            className="rounded-md gap-1 text-sm"
           >
            View

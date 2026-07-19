@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { Heart, Coffee } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Support = () => {
+  const navigate = useNavigate();
   return (
     <AppLayout>
       <div className="max-w-2xl mx-auto px-4 py-4">

@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { motion } from 'framer-motion';
 import { APP_VERSION } from '@/lib/appVersion';
 
 const About = () => {
+  const navigate = useNavigate();
   return (
     <AppLayout>
       <div className="max-w-2xl mx-auto px-4 py-4">
@@ -58,7 +60,7 @@ const About = () => {
 
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
               <Button
-                onClick={() => window.location.href = '/support'}
+                onClick={() => navigate('/support')}
                 className="w-full h-12 rounded-xl text-base font-medium bg-gradient-to-r from-pink-500 to-red-500 hover:from-pink-600 hover:to-red-600 text-white shadow-lg shadow-pink-500/25 transition-all duration-200"
               >
                 <Heart size={18} className="mr-2" />

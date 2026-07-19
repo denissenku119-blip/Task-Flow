@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +10,7 @@ import { motion } from 'framer-motion';
 import { APP_VERSION } from '@/lib/appVersion';
 
 const OpenSourceLicenses = () => {
+  const navigate = useNavigate();
   const licenses = [
     { name: "React", version: "19.2.3", license: "MIT", url: "https://react.dev" },
     { name: "Vite", version: "8.0.0", license: "MIT", url: "https://vitejs.dev" },
@@ -75,7 +77,7 @@ const OpenSourceLicenses = () => {
 
           <div className="mt-6 text-center">
             <Button
-              onClick={() => window.location.href = '/support'}
+              onClick={() => navigate('/support')}
               className="rounded-xl gap-2 bg-pink-500 hover:bg-pink-600 text-white"
             >
               <Heart size={18} />
