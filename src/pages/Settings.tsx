@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,32 +24,85 @@ import {
  SelectTrigger,
  SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
 import { useTasks } from "@/hooks/use-tasks";
 import { showSuccess, showError } from "@/utils/toast";
 import { FilterOption, SortOption } from "@/types/task";
 import {
- Sun, Moon, Monitor, Settings2, ShieldCheck, Download, Upload, Trash2, Timer, Info
+ Sun, Moon, Monitor, Settings2, ShieldCheck, Trash2, Info, MessageSquare, Heart
 } from 'lucide-react';
 
 const Settings = () => {
  const { theme, setTheme } = useTheme();
- const { settings, updateSettings, resetData, exportData, importData } = useTasks();
+ const { settings, updateSettings, resetData } = useTasks();
  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
- const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+ // Feedback form state
+ const [feedbackType, setFeedbackType] = useState('');
+ const [subject, setSubject] = useState('');
+ const [message, setMessage] = useState('');
+ const [rating, setRating] = useState(0);
+ const [screenshot, setScreenshot] = useState<File | null>(null);
+ const [isSubmitting, setIsSubmitting] = useState(false);
+ const [lastSubmissionTime, setLastSubmissionTime] = useState(0);
+
+ const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0];
   if (file) {
-   const reader = new FileReader();
-   reader.onload = (event) => {
-    const content = event.target?.result as string;
-    importData(content);
-    showSuccess("Data imported successfully!");
-   };
-   reader.onerror = () => showError("Failed to read file.");
-   reader.readAsText(file);
+   if (!file.type.startsWith('image/')) {
+    showError('Please upload an image file');
+    return;
+   }
+   if (file.size > 5 * 1024 * 1024) {
+    showError('Image must be less than 5MB');
+    return;
+   }
+   setScreenshot(file);
+  }
+ };
+
+ const handleSubmitFeedback = async () => {
+  const now = Date.now();
+  if (now - lastSubmissionTime < 5000) {
+   showError('Please wait before submitting again');
+   return;
+  }
+
+  if (!feedbackType || !subject || !message) {
+   showError('Please fill in all required fields');
+   return;
+  }
+
+  if (subject.length > 100) {
+   showError('Subject must be 100 characters or less');
+   return;
+  }
+
+  if (message.length > 2000) {
+   showError('Message must be 2000 characters or less');
+   return;
+  }
+
+  setIsSubmitting(true);
+
+  try {
+   // Simulate API call
+   await new Promise(resolve => setTimeout(resolve, 1000));
+
+   showSuccess('Feedback submitted successfully!');
+   setFeedbackType('');
+   setSubject('');
+   setMessage('');
+   setRating(0);
+   setScreenshot(null);
+   setLastSubmissionTime(now);
+  } catch (error) {
+   showError('Failed to submit feedback');
+  } finally {
+   setIsSubmitting(false);
   }
  };
 
@@ -164,94 +217,110 @@ const Settings = () => {
           </SelectContent>
          </Select>
         </div>
-
-        <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-         <div className="space-y-0.5">
-          <Label className="text-sm">Work Session Duration (min)</Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Set the length of your work session.</p>
-         </div>
-         <Input
-          type="number"
-          min={1}
-          max={999}
-          value={settings.workDuration}
-          onChange={(e) => {
-           const val = Number(e.target.value);
-           if (!Number.isNaN(val)) {
-            updateSettings({ workDuration: val });
-           }
-          }}
-          className="rounded-md border border-slate-200 dark:border-slate-800 w-[60px] h-9 text-sm px-2"
-         />
-        </div>
        </Card>
       </section>
 
-      {/* Timer Settings */}
+      {/* Feedback & Suggestions */}
       <section>
        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Timer size={18} className="text-blue-500" />
-        Timer Settings
+        <MessageSquare size={18} className="text-blue-500" />
+        Feedback & Suggestions
        </h2>
-       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
-        <div className="flex items-center justify-between">
-         <div className="space-y-0.5">
-          <Label className="text-sm">Timer Sounds</Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Configure sounds for timer notifications.</p>
-         </div>
-         <Switch checked={settings.soundEnabled} onCheckedChange={(val) => updateSettings({ soundEnabled: val })} />
+       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-4">
+        <div className="space-y-1">
+         <Label className="text-sm">Help Improve TaskFlow</Label>
+         <p className="text-xs text-slate-500 dark:text-slate-400">We'd love to hear your ideas, bug reports and feature requests.</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-         <div className="flex flex-col items-center">
-          <Label className="text-xs">Work Sound</Label>
-          <Select>
-           <SelectTrigger className="w-[100px] rounded-md h-8">
-            <SelectValue className="text-xs" />
-           </SelectTrigger>
-           <SelectContent className="rounded-md">
-            <SelectItem value="Classic Bell" className="text-xs">Classic Bell</SelectItem>
-            <SelectItem value="Digital Beep" className="text-xs">Digital Beep</SelectItem>
-            <SelectItem value="Soft Chime" className="text-xs">Soft Chime</SelectItem>
-            <SelectItem value="Gentle Piano" className="text-xs">Gentle Piano</SelectItem>
-            <SelectItem value="Zen Gong" className="text-xs">Zen Gong</SelectItem>
-            <SelectItem value="No Sound" className="text-xs">No Sound</SelectItem>
-           </SelectContent>
-          </Select>
-         </div>
-         <div className="flex flex-col items-center">
-          <Label className="text-xs">Short Break Sound</Label>
-          <Select>
-           <SelectTrigger className="w-[100px] rounded-md h-8">
-            <SelectValue className="text-xs" />
-           </SelectTrigger>
-           <SelectContent className="rounded-md">
-            <SelectItem value="Classic Bell" className="text-xs">Classic Bell</SelectItem>
-            <SelectItem value="Digital Beep" className="text-xs">Digital Beep</SelectItem>
-            <SelectItem value="Soft Chime" className="text-xs">Soft Chime</SelectItem>
-            <SelectItem value="Gentle Piano" className="text-xs">Gentle Piano</SelectItem>
-            <SelectItem value="Zen Gong" className="text-xs">Zen Gong</SelectItem>
-            <SelectItem value="No Sound" className="text-xs">No Sound</SelectItem>
-           </SelectContent>
-          </Select>
-         </div>
-         <div className="flex flex-col items-center">
-          <Label className="text-xs">Long Break Sound</Label>
-          <Select>
-           <SelectTrigger className="w-[100px] rounded-md h-8">
-            <SelectValue className="text-xs" />
-           </SelectTrigger>
-           <SelectContent className="rounded-md">
-            <SelectItem value="Classic Bell" className="text-xs">Classic Bell</SelectItem>
-            <SelectItem value="Digital Beep" className="text-xs">Digital Beep</SelectItem>
-            <SelectItem value="Soft Chime" className="text-xs">Soft Chime</SelectItem>
-            <SelectItem value="Gentle Piano" className="text-xs">Gentle Piano</SelectItem>
-            <SelectItem value="Zen Gong" className="text-xs">Zen Gong</SelectItem>
-            <SelectItem value="No Sound" className="text-xs">No Sound</SelectItem>
-           </SelectContent>
-          </Select>
+        <div className="space-y-2">
+         <Label className="text-sm">Feedback Type *</Label>
+         <Select value={feedbackType} onValueChange={setFeedbackType}>
+          <SelectTrigger className="rounded-md h-9">
+           <SelectValue placeholder="Select type" />
+          </SelectTrigger>
+          <SelectContent className="rounded-md">
+           <SelectItem value="Feature Request">Feature Request</SelectItem>
+           <SelectItem value="Bug Report">Bug Report</SelectItem>
+           <SelectItem value="General Feedback">General Feedback</SelectItem>
+           <SelectItem value="UI/Design Suggestion">UI/Design Suggestion</SelectItem>
+           <SelectItem value="Performance Issue">Performance Issue</SelectItem>
+           <SelectItem value="Other">Other</SelectItem>
+          </SelectContent>
+         </Select>
+        </div>
+
+        <div className="space-y-2">
+         <Label className="text-sm">Subject (max 100 chars) *</Label>
+         <Input
+          placeholder="Brief title for your feedback"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+          maxLength={100}
+          className="rounded-md"
+         />
+         <p className="text-xs text-slate-400 text-right">{subject.length}/100</p>
+        </div>
+
+        <div className="space-y-2">
+         <Label className="text-sm">Message (max 2000 chars) *</Label>
+         <Textarea
+          placeholder="Tell us what you love, what should be improved, or what new feature you'd like to see."
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          maxLength={2000}
+          className="rounded-md min-h-[100px] resize-none"
+         />
+         <p className="text-xs text-slate-400 text-right">{message.length}/2000</p>
+        </div>
+
+        <div className="space-y-2">
+         <Label className="text-sm">Rating (Optional)</Label>
+         <div className="flex gap-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+           <button
+            key={star}
+            onClick={() => setRating(star)}
+            className={cn(
+             "w-8 h-8 rounded-full transition-colors",
+             star <= rating ? "text-yellow-500" : "text-slate-300"
+            )}
+           >
+            ★
+           </button>
+          ))}
          </div>
         </div>
+
+        <div className="space-y-2">
+         <Label className="text-sm">Screenshot (Optional, max 5MB)</Label>
+         <div className="flex items-center gap-2">
+          <Button
+           variant="outline"
+           onClick={() => fileInputRef.current?.click()}
+           className="rounded-md text-sm"
+          >
+           Attach Screenshot
+          </Button>
+          {screenshot && (
+           <span className="text-xs text-slate-500">{screenshot.name}</span>
+          )}
+          <input
+           type="file"
+           ref={fileInputRef}
+           onChange={handleScreenshotChange}
+           accept="image/*"
+           className="hidden"
+          />
+         </div>
+        </div>
+
+        <Button
+         onClick={handleSubmitFeedback}
+         disabled={isSubmitting || !feedbackType || !subject || !message}
+         className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+        >
+         {isSubmitting ? 'Submitting...' : 'Send Feedback'}
+        </Button>
        </Card>
       </section>
 
@@ -262,35 +331,6 @@ const Settings = () => {
         Data & Privacy
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
-        <div className="flex items-center justify-between">
-         <div className="space-y-0.5">
-          <Label className="text-sm">Export Data</Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Download a backup of all your tasks and settings.</p>
-         </div>
-         <Button variant="outline" onClick={exportData} className="rounded-md gap-1 text-sm">
-          <Download size={14} />
-          Export JSON
-         </Button>
-        </div>
-
-        <div className="flex items-center justify-between">
-         <div className="space-y-0.5">
-          <Label className="text-sm">Import Data</Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Restore tasks from a backup file.</p>
-         </div>
-         <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="rounded-md gap-1 text-sm">
-          <Upload size={14} />
-          Import JSON
-         </Button>
-         <input
-          type="file"
-          ref={fileInputRef}
-          onChange={handleImport}
-          accept=".json"
-          className="hidden"
-         />
-        </div>
-
         <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
          <div className="space-y-0.5">
           <Label className="text-sm text-red-600">Reset All Data</Label>
