@@ -362,6 +362,58 @@ const Settings = () => {
        </Card>
       </section>
 
+      {/* Support TaskFlow */}
+      <section>
+       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+        <Heart size={18} className="text-pink-500" />
+        Support TaskFlow
+       </h2>
+       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
+        <div className="space-y-2">
+         <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+           <div className="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center text-white shadow-md">
+            <Heart size={20} />
+           </div>
+           <div>
+            <h3 className="text-sm font-medium">Support TaskFlow</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Optional donations to help TaskFlow grow</p>
+           </div>
+          </div>
+          <Button
+           variant="outline"
+           size="sm"
+           onClick={() => window.location.href = '/support'}
+           className="rounded-md gap-1 text-sm"
+          >
+           View Support
+          </Button>
+         </div>
+        </div>
+       </Card>
+      </section>
+
+      {/* Supporter Badge */}
+      <section>
+       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+        <Heart size={18} className="text-pink-500" />
+        Supporter
+       </h2>
+       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
+        <div className="space-y-2">
+         <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center text-pink-500 shadow-md">
+           <Heart size={20} />
+          </div>
+          <div>
+           <h3 className="text-sm font-medium">❤️ Supporter</h3>
+           <p className="text-xs text-slate-500 dark:text-slate-400">This badge will only appear after Google Play confirms a successful donation.</p>
+          </div>
+         </div>
+        </div>
+       </Card>
+      </section>
+
       {/* About */}
       <section>
        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
