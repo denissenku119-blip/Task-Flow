@@ -5,6 +5,8 @@ import {
   isSameDay, format 
 } from 'date-fns';
 import { showSuccess, showError } from '@/utils/toast';
+import { useScreenshotMode } from '@/components/ScreenshotModeProvider';
+import { SCREENSHOT_TASKS, SCREENSHOT_SETTINGS, SCREENSHOT_STREAK, SCREENSHOT_COMPLETION } from '@/lib/screenshotData';
 
 const STORAGE_KEY = 'taskflow_tasks_v2';
 const SETTINGS_KEY = 'taskflow_settings_v2';
@@ -23,12 +25,15 @@ const DEFAULT_SETTINGS: AppSettings = {
 };
 
 export const useTasks = () => {
+  const { screenshotMode } = useScreenshotMode();
   const [tasks, setTasks] = useState<Task[]>(() => {
+    if (screenshotMode) return SCREENSHOT_TASKS;
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved) : [];
   });
 
   const [settings, setSettings] = useState<AppSettings>(() => {
+    if (screenshotMode) return SCREENSHOT_SETTINGS;
     const saved = localStorage.getItem(SETTINGS_KEY);
     return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
   });
@@ -41,23 +46,31 @@ export const useTasks = () => {
   const [sortBy, setSortBy] = useState<SortOption>(settings.defaultSort);
 
   useEffect(() => {
+    if (screenshotMode) {
+      setTasks(SCREENSHOT_TASKS);
+      setSettings(SCREENSHOT_SETTINGS);
+      return;
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-  }, [tasks]);
+  }, [tasks, screenshotMode]);
 
   useEffect(() => {
+    if (screenshotMode) return;
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-  }, [settings]);
+  }, [settings, screenshotMode]);
 
   const saveToHistory = useCallback(() => {
     setHistory(prev => [tasks, ...prev].slice(0, 20));
   }, [tasks]);
 
   const updateSettings = (updates: Partial<AppSettings>) => {
+    if (screenshotMode) return;
     setSettings(prev => ({ ...prev, ...updates }));
     showSuccess("Settings updated");
   };
 
   const resetData = () => {
+    if (screenshotMode) return;
     setTasks([]);
     setSettings(DEFAULT_SETTINGS);
     localStorage.removeItem(STORAGE_KEY);
@@ -67,6 +80,7 @@ export const useTasks = () => {
   };
 
   const exportData = () => {
+    if (screenshotMode) return;
     const data = { tasks, settings };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -78,6 +92,7 @@ export const useTasks = () => {
   };
 
   const importData = (jsonString: string) => {
+    if (screenshotMode) return;
     try {
       const data = JSON.parse(jsonString);
       if (data.tasks) setTasks(data.tasks);
@@ -89,6 +104,7 @@ export const useTasks = () => {
   };
 
   const addTask = (taskData: Partial<Task>) => {
+    if (screenshotMode) return;
     saveToHistory();
     const newTask: Task = {
       id: crypto.randomUUID(),
@@ -117,6 +133,7 @@ export const useTasks = () => {
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
+    if (screenshotMode) return;
     saveToHistory();
     setTasks(prev => prev.map(task => 
       task.id === id ? { ...task, ...updates, lastEdited: new Date().toISOString() } : task
@@ -124,12 +141,14 @@ export const useTasks = () => {
   };
 
   const deleteTask = (id: string) => {
+    if (screenshotMode) return;
     saveToHistory();
     setTasks(prev => prev.filter(task => task.id !== id));
     showSuccess("Task deleted");
   };
 
   const duplicateTask = (id: string) => {
+    if (screenshotMode) return;
     const task = tasks.find(t => t.id === id);
     if (!task) return;
     saveToHistory();
@@ -146,6 +165,7 @@ export const useTasks = () => {
   };
 
   const toggleComplete = (id: string) => {
+    if (screenshotMode) return;
     const task = tasks.find(t => t.id === id);
     if (!task) return;
     updateTask(id, { isCompleted: !task.isCompleted });
@@ -153,18 +173,21 @@ export const useTasks = () => {
   };
 
   const togglePin = (id: string) => {
+    if (screenshotMode) return;
     const task = tasks.find(t => t.id === id);
     if (!task) return;
     updateTask(id, { isPinned: !task.isPinned });
   };
 
   const toggleImportant = (id: string) => {
+    if (screenshotMode) return;
     const task = tasks.find(t => t.id === id);
     if (!task) return;
     updateTask(id, { isImportant: !task.isImportant });
   };
 
   const toggleArchive = (id: string) => {
+    if (screenshotMode) return;
     const task = tasks.find(t => t.id === id);
     if (!task) return;
     updateTask(id, { isArchived: !task.isArchived });
@@ -242,6 +265,17 @@ export const useTasks = () => {
   }, [tasks, searchQuery, filter, categoryFilter, priorityFilter, sortBy]);
 
   const stats = useMemo(() => {
+    if (screenshotMode) {
+      return {
+        total: SCREENSHOT_TASKS.length,
+        completed: 18,
+        pending: 5,
+        percentage: SCREENSHOT_COMPLETION,
+        todayTasks: SCREENSHOT_TASKS.filter(t => isSameDay(parseISO(t.dueDate), startOfDay(new Date()))),
+        overdueTasks: [],
+        streak: SCREENSHOT_STREAK,
+      } as any;
+    }
     const active = tasks.filter(t => !t.isArchived);
     const completed = active.filter(t => t.isCompleted).length;
     const total = active.length;
@@ -252,7 +286,7 @@ export const useTasks = () => {
     const overdueTasks = active.filter(t => !t.isCompleted && isBefore(parseISO(t.dueDate), today));
 
     return { total, completed, pending: total - completed, percentage, todayTasks, overdueTasks };
-  }, [tasks]);
+  }, [tasks, screenshotMode]);
 
   return {
     tasks,

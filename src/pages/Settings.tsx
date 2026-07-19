@@ -32,14 +32,16 @@ import { useTheme } from "next-themes";
 import { useTasks } from "@/hooks/use-tasks";
 import { showSuccess, showError } from "@/utils/toast";
 import { FilterOption, SortOption } from "@/types/task";
+import { useScreenshotMode } from "@/components/ScreenshotModeProvider";
 import {
- Sun, Moon, Monitor, Settings2, ShieldCheck, Trash2, Info, MessageSquare, Heart, FileText, BookOpen, Code, Shield
+ Sun, Moon, Monitor, Settings2, ShieldCheck, Trash2, Info, MessageSquare, Heart, FileText, BookOpen, Code, Shield, Camera, Terminal
 } from 'lucide-react';
 import { APP_VERSION } from '@/lib/appVersion';
 
 const Settings = () => {
  const { theme, setTheme } = useTheme();
  const { settings, updateSettings, resetData } = useTasks();
+ const { screenshotMode, setScreenshotMode } = useScreenshotMode();
  const navigate = useNavigate();
  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -92,9 +94,7 @@ const Settings = () => {
   setIsSubmitting(true);
 
   try {
-   // Simulate API call
    await new Promise(resolve => setTimeout(resolve, 1000));
-
    showSuccess('Feedback submitted successfully!');
    setFeedbackType('');
    setSubject('');
@@ -128,36 +128,17 @@ const Settings = () => {
           <p className="text-xs text-slate-500 dark:text-slate-400">Choose how TaskFlow looks to you.</p>
          </div>
          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-          <Button
-           variant={theme === 'light' ? 'secondary' : 'ghost'}
-           size="sm"
-           onClick={() => setTheme('light')}
-           className="rounded-md gap-1 text-xs"
-          >
-           <Sun size={12} />
-           Light
+          <Button variant={theme === 'light' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTheme('light')} className="rounded-md gap-1 text-xs">
+           <Sun size={12} /> Light
           </Button>
-          <Button
-           variant={theme === 'dark' ? 'secondary' : 'ghost'}
-           size="sm"
-           onClick={() => setTheme('dark')}
-           className="rounded-md gap-1 text-xs"
-          >
-           <Moon size={12} />
-           Dark
+          <Button variant={theme === 'dark' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTheme('dark')} className="rounded-md gap-1 text-xs">
+           <Moon size={12} /> Dark
           </Button>
-          <Button
-           variant={theme === 'system' ? 'secondary' : 'ghost'}
-           size="sm"
-           onClick={() => setTheme('system')}
-           className="rounded-md gap-1 text-xs"
-          >
-           <Monitor size={12} />
-           System
+          <Button variant={theme === 'system' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTheme('system')} className="rounded-md gap-1 text-xs">
+           <Monitor size={12} /> System
           </Button>
          </div>
         </div>
-
         <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
          <div className="space-y-0.5">
           <Label className="text-sm">Enable Animations</Label>
@@ -180,10 +161,7 @@ const Settings = () => {
           <Label className="text-sm">Default Filter</Label>
           <p className="text-xs text-slate-500 dark:text-slate-400">The view you see when opening the app.</p>
          </div>
-         <Select
-          value={settings.defaultFilter}
-          onValueChange={(val) => updateSettings({ defaultFilter: val as FilterOption })}
-         >
+         <Select value={settings.defaultFilter} onValueChange={(val) => updateSettings({ defaultFilter: val as FilterOption })}>
           <SelectTrigger className="w-[120px] rounded-md h-9">
            <SelectValue className="text-sm" />
           </SelectTrigger>
@@ -198,16 +176,12 @@ const Settings = () => {
           </SelectContent>
          </Select>
         </div>
-
         <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
          <div className="space-y-0.5">
           <Label className="text-sm">Default Sorting</Label>
           <p className="text-xs text-slate-500 dark:text-slate-400">How tasks are ordered by default.</p>
          </div>
-         <Select
-          value={settings.defaultSort}
-          onValueChange={(val) => updateSettings({ defaultSort: val as SortOption })}
-         >
+         <Select value={settings.defaultSort} onValueChange={(val) => updateSettings({ defaultSort: val as SortOption })}>
           <SelectTrigger className="w-[120px] rounded-md h-9">
            <SelectValue className="text-sm" />
           </SelectTrigger>
@@ -223,7 +197,7 @@ const Settings = () => {
        </Card>
       </section>
 
-      {/* Feedback & Suggestions */}
+      {/* Feedback */}
       <section>
        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
         <MessageSquare size={18} className="text-blue-500" />
@@ -234,7 +208,6 @@ const Settings = () => {
          <Label className="text-sm">Help Improve TaskFlow</Label>
          <p className="text-xs text-slate-500 dark:text-slate-400">We'd love to hear your ideas, bug reports and feature requests.</p>
         </div>
-
         <div className="space-y-2">
          <Label className="text-sm">Feedback Type *</Label>
          <Select value={feedbackType} onValueChange={setFeedbackType}>
@@ -251,77 +224,37 @@ const Settings = () => {
           </SelectContent>
          </Select>
         </div>
-
         <div className="space-y-2">
          <Label className="text-sm">Subject (max 100 chars) *</Label>
-         <Input
-          placeholder="Brief title for your feedback"
-          value={subject}
-          onChange={(e) => setSubject(e.target.value)}
-          maxLength={100}
-          className="rounded-md"
-         />
+         <Input placeholder="Brief title for your feedback" value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={100} className="rounded-md" />
          <p className="text-xs text-slate-400 text-right">{subject.length}/100</p>
         </div>
-
         <div className="space-y-2">
          <Label className="text-sm">Message (max 2000 chars) *</Label>
-         <Textarea
-          placeholder="Tell us what you love, what should be improved, or what new feature you'd like to see."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          maxLength={2000}
-          className="rounded-md min-h-[100px] resize-none"
-         />
+         <Textarea placeholder="Tell us what you love, what should be improved, or what new feature you'd like to see." value={message} onChange={(e) => setMessage(e.target.value)} maxLength={2000} className="rounded-md min-h-[100px] resize-none" />
          <p className="text-xs text-slate-400 text-right">{message.length}/2000</p>
         </div>
-
         <div className="space-y-2">
          <Label className="text-sm">Rating (Optional)</Label>
          <div className="flex gap-1">
           {[1, 2, 3, 4, 5].map((star) => (
-           <button
-            key={star}
-            onClick={() => setRating(star)}
-            className={cn(
-             "w-8 h-8 rounded-full transition-colors",
-             star <= rating ? "text-yellow-500" : "text-slate-300"
-            )}
-           >
+           <button key={star} onClick={() => setRating(star)} className={cn("w-8 h-8 rounded-full transition-colors", star <= rating ? "text-yellow-500" : "text-slate-300")}>
             ★
            </button>
           ))}
          </div>
         </div>
-
         <div className="space-y-2">
          <Label className="text-sm">Screenshot (Optional, max 5MB)</Label>
          <div className="flex items-center gap-2">
-          <Button
-           variant="outline"
-           onClick={() => fileInputRef.current?.click()}
-           className="rounded-md text-sm"
-          >
+          <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="rounded-md text-sm">
            Attach Screenshot
           </Button>
-          {screenshot && (
-           <span className="text-xs text-slate-500">{screenshot.name}</span>
-          )}
-          <input
-           type="file"
-           ref={fileInputRef}
-           onChange={handleScreenshotChange}
-           accept="image/*"
-           className="hidden"
-          />
+          {screenshot && <span className="text-xs text-slate-500">{screenshot.name}</span>}
+          <input type="file" ref={fileInputRef} onChange={handleScreenshotChange} accept="image/*" className="hidden" />
          </div>
         </div>
-
-        <Button
-         onClick={handleSubmitFeedback}
-         disabled={isSubmitting || !feedbackType || !subject || !message}
-         className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-        >
+        <Button onClick={handleSubmitFeedback} disabled={isSubmitting || !feedbackType || !subject || !message} className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md">
          {isSubmitting ? 'Submitting...' : 'Send Feedback'}
         </Button>
        </Card>
@@ -342,8 +275,7 @@ const Settings = () => {
          <AlertDialog>
           <AlertDialogTrigger asChild>
            <Button variant="destructive" className="rounded-md gap-1 text-sm">
-            <Trash2 size={14} />
-            Reset App
+            <Trash2 size={14} /> Reset App
            </Button>
           </AlertDialogTrigger>
           <AlertDialogContent className="rounded-lg">
@@ -365,53 +297,44 @@ const Settings = () => {
        </Card>
       </section>
 
-      {/* Support TaskFlow */}
+      {/* Support */}
       <section>
        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
         <Heart size={18} className="text-pink-500" />
         Support TaskFlow
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
-        <div className="space-y-2">
-         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-           <div className="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center text-white shadow-md">
-            <Heart size={20} />
-           </div>
-           <div>
-            <h3 className="text-sm font-medium">Support TaskFlow</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Optional donations to help TaskFlow grow</p>
-           </div>
+        <div className="flex items-center justify-between">
+         <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center text-white shadow-md">
+           <Heart size={20} />
           </div>
-          <Button
-           variant="outline"
-           size="sm"
-           onClick={() => navigate('/support')}
-           className="rounded-md gap-1 text-sm"
-          >
-           View Support
-          </Button>
+          <div>
+           <h3 className="text-sm font-medium">Support TaskFlow</h3>
+           <p className="text-xs text-slate-500 dark:text-slate-400">Optional donations to help TaskFlow grow</p>
+          </div>
          </div>
+         <Button variant="outline" size="sm" onClick={() => navigate('/support')} className="rounded-md gap-1 text-sm">
+          View Support
+         </Button>
         </div>
        </Card>
       </section>
 
-      {/* Supporter Badge */}
+      {/* Supporter */}
       <section>
        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
         <Heart size={18} className="text-pink-500" />
         Supporter
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
-        <div className="space-y-2">
-         <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center text-pink-500 shadow-md">
-           <Heart size={20} />
-          </div>
-          <div>
-           <h3 className="text-sm font-medium">❤️ Supporter</h3>
-           <p className="text-xs text-slate-500 dark:text-slate-400">This badge will only appear after Google Play confirms a successful donation.</p>
-          </div>
+        <div className="flex items-center gap-2.5">
+         <div className="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center text-pink-500 shadow-md">
+          <Heart size={20} />
+         </div>
+         <div>
+          <h3 className="text-sm font-medium">❤️ Supporter</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">This badge will only appear after Google Play confirms a successful donation.</p>
          </div>
         </div>
        </Card>
@@ -424,136 +347,117 @@ const Settings = () => {
         About
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
-        <div className="space-y-2">
-         <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white shadow-md">
-           <ShieldCheck size={20} />
-          </div>
-          <div>
-           <h3 className="text-sm font-medium">TaskFlow v{APP_VERSION}</h3>
-           <p className="text-xs text-slate-500">Organize your life beautifully.</p>
-          </div>
+        <div className="flex items-center gap-2.5">
+         <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white shadow-md">
+          <ShieldCheck size={20} />
          </div>
-         <p className="text-xs text-slate-500 leading-relaxed">
-          TaskFlow is a modern, privacy-focused task management application. All your data is stored locally on your device and never leaves your browser.
-         </p>
+         <div>
+          <h3 className="text-sm font-medium">TaskFlow v{APP_VERSION}</h3>
+          <p className="text-xs text-slate-500">Organize your life beautifully.</p>
+         </div>
         </div>
+        <p className="text-xs text-slate-500 leading-relaxed mt-2">
+         TaskFlow is a modern, privacy-focused task management application. All your data is stored locally on your device and never leaves your browser.
+        </p>
        </Card>
       </section>
 
-      {/* Privacy Policy */}
+      {/* Privacy */}
       <section>
        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
         <FileText size={18} className="text-blue-500" />
         Privacy Policy
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
-        <div className="space-y-2">
-         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-           <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
-            <Shield size={20} />
-           </div>
-           <div>
-            <h3 className="text-sm font-medium">Privacy Policy</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">How we protect your data</p>
-           </div>
+        <div className="flex items-center justify-between">
+         <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
+           <Shield size={20} />
           </div>
-          <Button
-           variant="outline"
-           size="sm"
-           onClick={() => navigate('/privacy')}
-           className="rounded-md gap-1 text-sm"
-          >
-           View
-          </Button>
+          <div>
+           <h3 className="text-sm font-medium">Privacy Policy</h3>
+           <p className="text-xs text-slate-500 dark:text-slate-400">How we protect your data</p>
+          </div>
          </div>
+         <Button variant="outline" size="sm" onClick={() => navigate('/privacy')} className="rounded-md gap-1 text-sm">
+          View
+         </Button>
         </div>
        </Card>
       </section>
 
-      {/* Terms of Service */}
+      {/* Terms */}
       <section>
        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
         <BookOpen size={18} className="text-blue-500" />
         Terms of Service
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
-        <div className="space-y-2">
-         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-           <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
-            <BookOpen size={20} />
-           </div>
-           <div>
-            <h3 className="text-sm font-medium">Terms of Service</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Usage terms and conditions</p>
-           </div>
+        <div className="flex items-center justify-between">
+         <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
+           <BookOpen size={20} />
           </div>
-          <Button
-           variant="outline"
-           size="sm"
-           onClick={() => navigate('/terms')}
-           className="rounded-md gap-1 text-sm"
-          >
-           View
-          </Button>
+          <div>
+           <h3 className="text-sm font-medium">Terms of Service</h3>
+           <p className="text-xs text-slate-500 dark:text-slate-400">Usage terms and conditions</p>
+          </div>
          </div>
+         <Button variant="outline" size="sm" onClick={() => navigate('/terms')} className="rounded-md gap-1 text-sm">
+          View
+         </Button>
         </div>
        </Card>
       </section>
 
-      {/* App Version */}
-      <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Info size={18} className="text-blue-500" />
-        App Version
-       </h2>
-       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
-        <div className="space-y-2">
-         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-           <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
-            <Info size={20} />
-           </div>
-           <div>
-            <h3 className="text-sm font-medium">TaskFlow v{APP_VERSION}</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Current version</p>
-           </div>
-          </div>
-         </div>
-        </div>
-       </Card>
-      </section>
-
-      {/* Open Source Licenses */}
+      {/* Licenses */}
       <section>
        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
         <Code size={18} className="text-blue-500" />
         Open Source Licenses
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
-        <div className="space-y-2">
-         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-           <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
-            <Code size={20} />
-           </div>
-           <div>
-            <h3 className="text-sm font-medium">Open Source Licenses</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Third-party libraries used</p>
-           </div>
+        <div className="flex items-center justify-between">
+         <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
+           <Code size={20} />
           </div>
-          <Button
-           variant="outline"
-           size="sm"
-           onClick={() => navigate('/licenses')}
-           className="rounded-md gap-1 text-sm"
-          >
-           View
-          </Button>
+          <div>
+           <h3 className="text-sm font-medium">Open Source Licenses</h3>
+           <p className="text-xs text-slate-500 dark:text-slate-400">Third-party libraries used</p>
+          </div>
          </div>
+         <Button variant="outline" size="sm" onClick={() => navigate('/licenses')} className="rounded-md gap-1 text-sm">
+          View
+         </Button>
         </div>
+       </Card>
+      </section>
+
+      {/* Developer */}
+      <section>
+       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+        <Terminal size={18} className="text-slate-500" />
+        Developer
+       </h2>
+       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
+        <div className="flex items-center justify-between">
+         <div className="space-y-0.5">
+          <Label className="text-sm flex items-center gap-1.5">
+           <Camera size={14} className="text-blue-500" />
+           Screenshot Mode
+          </Label>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Populate app with sample data and hide personal info for store listings.</p>
+         </div>
+         <Switch checked={screenshotMode} onCheckedChange={setScreenshotMode} />
+        </div>
+        {screenshotMode && (
+         <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+           Screenshot Mode is ON. All pages now show demo data. Toggle off to return to your real tasks.
+          </p>
+         </div>
+        )}
        </Card>
       </section>
      </div>

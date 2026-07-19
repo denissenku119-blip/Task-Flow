@@ -1,4 +1,4 @@
-"use client"; import React from 'react'; import AppLayout from '@/components/layout/AppLayout'; import StatsGrid from '@/components/dashboard/StatsGrid'; import TaskCard from '@/components/tasks/TaskCard'; import TaskForm from '@/components/tasks/TaskForm'; import PomodoroTimer from '@/components/productivity/PomodoroTimer'; import { useTasks } from '@/hooks/use-tasks'; import { Button } from '@/components/ui/button'; import { Plus, Target, Pin } from 'lucide-react'; import { Link } from 'react-router-dom'; import { Task } from '@/types/task'; import { Card } from '@/components/ui/card';
+"use client"; import React from 'react'; import AppLayout from '@/components/layout/AppLayout'; import StatsGrid from '@/components/dashboard/StatsGrid'; import WeeklyChart from '@/components/dashboard/WeeklyChart'; import TaskCard from '@/components/tasks/TaskCard'; import TaskForm from '@/components/tasks/TaskForm'; import PomodoroTimer from '@/components/productivity/PomodoroTimer'; import { useTasks } from '@/hooks/use-tasks'; import { Button } from '@/components/ui/button'; import { Plus, Target, Pin, Flame } from 'lucide-react'; import { Link } from 'react-router-dom'; import { Task } from '@/types/task'; import { Card } from '@/components/ui/card';
 
 const Index = () => {
  const { stats, tasks, addTask, updateTask, deleteTask, toggleComplete, togglePin, toggleImportant, toggleArchive, duplicateTask } = useTasks();
@@ -27,7 +27,6 @@ const Index = () => {
  return (
   <AppLayout>
    <div className="max-w-7xl mx-auto space-y-6">
-    {/* Header */}
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
      <div>
       <p className="text-blue-600 font-bold text-sm uppercase tracking-widest mb-1"> Dashboard Overview </p>
@@ -37,13 +36,10 @@ const Index = () => {
       <Plus size={20} className="mr-1"/> Create Task
      </Button>
     </div>
-    {/* Main Grid */}
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-     {/* Left side */}
      <div className="lg:col-span-8 space-y-5">
       <StatsGrid stats={stats} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-       {/* Pinned */}
        <section>
         <div className="flex items-center justify-between mb-4">
          <h2 className="text-xl font-bold flex items-center gap-1"> <Pin size={16} className="text-blue-600"/> Pinned </h2>
@@ -53,7 +49,6 @@ const Index = () => {
          {pinnedTasks.length > 0 ? ( pinnedTasks.map(task => ( <TaskCard key={task.id} task={task} onToggleComplete={toggleComplete} onEdit={handleEdit} onDelete={deleteTask} onTogglePin={togglePin} onToggleImportant={toggleImportant} onToggleArchive={toggleArchive} onDuplicate={duplicateTask} /> )) ) : ( <div className="p-6 border-2 border-dashed border-slate-200 rounded-xl text-center text-slate-400"> No pinned tasks </div> )} 
         </div>
        </section>
-       {/* Today */}
        <section>
         <div className="flex items-center justify-between mb-4">
          <h2 className="text-xl font-bold flex items-center gap-1"> <Target size={16} className="text-blue-600"/> Today </h2>
@@ -65,12 +60,13 @@ const Index = () => {
        </section>
       </div>
      </div>
-     {/* Right side */}
      <div className="lg:col-span-4 space-y-5">
       <PomodoroTimer />
+      <WeeklyChart />
       <Card className="p-5 border-slate-200 dark:border-slate-800 rounded-2xl bg-blue-600 text-white shadow-sm shadow-blue-500/5">
        <h3 className="text-lg font-bold mb-2">Quick Stats</h3>
-       <p className="mb-1">Most productive day: {mostProductiveDay}</p>
+       <p className="mb-1 flex items-center gap-1.5"> <Flame size={16} className="text-orange-200"/> {stats.streak ? `${stats.streak}-day streak` : mostProductiveDay} </p>
+       <p>Most productive: {mostProductiveDay}</p>
        <p>Total tasks: {tasks.length}</p>
       </Card>
      </div>
