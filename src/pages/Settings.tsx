@@ -32,8 +32,9 @@ import { useTasks } from "@/hooks/use-tasks";
 import { showSuccess, showError } from "@/utils/toast";
 import { FilterOption, SortOption } from "@/types/task";
 import {
- Sun, Moon, Monitor, Settings2, ShieldCheck, Trash2, Info, MessageSquare, Heart
+ Sun, Moon, Monitor, Settings2, ShieldCheck, Trash2, Info, MessageSquare, Heart, FileText, BookOpen, Code, Shield
 } from 'lucide-react';
+import { APP_VERSION } from '@/lib/appVersion';
 
 const Settings = () => {
  const { theme, setTheme } = useTheme();
@@ -414,29 +415,152 @@ const Settings = () => {
        </Card>
       </section>
 
-      {/* About */}
-      <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Info size={18} className="text-blue-500" />
-        About
-       </h2>
-       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
-        <div className="space-y-2">
-         <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white shadow-md">
-           <ShieldCheck size={20} />
-          </div>
-          <div>
-           <h3 className="text-sm font-medium">TaskFlow v1.0.0</h3>
-           <p className="text-xs text-slate-500">Organize your life beautifully.</p>
-          </div>
-         </div>
-         <p className="text-xs text-slate-500 leading-relaxed">
-          TaskFlow is a modern, privacy-focused task management application. All your data is stored locally on your device and never leaves your browser.
-         </p>
-        </div>
-       </Card>
-      </section>
+      {/* Privacy Policy */}
+            <section>
+             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <FileText size={18} className="text-blue-500" />
+              Privacy Policy
+             </h2>
+             <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
+              <div className="space-y-2">
+               <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                 <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
+                  <Shield size={20} />
+                 </div>
+                 <div>
+                  <h3 className="text-sm font-medium">Privacy Policy</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">How we protect your data</p>
+                 </div>
+                </div>
+                <Button
+                 variant="outline"
+                 size="sm"
+                 onClick={() => window.location.href = '/privacy-policy'}
+                 className="rounded-md gap-1 text-sm"
+                >
+                 View
+                </Button>
+               </div>
+              </div>
+             </Card>
+            </section>
+      
+            {/* Terms of Service */}
+            <section>
+             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <BookOpen size={18} className="text-blue-500" />
+              Terms of Service
+             </h2>
+             <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
+              <div className="space-y-2">
+               <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                 <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
+                  <BookOpen size={20} />
+                 </div>
+                 <div>
+                  <h3 className="text-sm font-medium">Terms of Service</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Usage terms and conditions</p>
+                 </div>
+                </div>
+                <Button
+                 variant="outline"
+                 size="sm"
+                 onClick={() => window.location.href = '/terms-of-service'}
+                 className="rounded-md gap-1 text-sm"
+                >
+                 View
+                </Button>
+               </div>
+              </div>
+             </Card>
+            </section>
+      
+            {/* App Version */}
+            <section>
+             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <Info size={18} className="text-blue-500" />
+              App Version
+             </h2>
+             <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
+              <div className="space-y-2">
+               <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                 <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
+                  <Info size={20} />
+                 </div>
+                 <div>
+                  <h3 className="text-sm font-medium">TaskFlow v{APP_VERSION}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Current version</p>
+                 </div>
+                </div>
+               </div>
+              </div>
+             </Card>
+            </section>
+      
+            {/* Open Source Licenses */}
+            <section>
+             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <Code size={18} className="text-blue-500" />
+              Open Source Licenses
+             </h2>
+             <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
+              <div className="space-y-2">
+               <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                 <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center text-blue-500">
+                  <Code size={20} />
+                 </div>
+                 <div>
+                  <h3 className="text-sm font-medium">Open Source Licenses</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Third-party libraries used</p>
+                 </div>
+                </div>
+                <Button
+                 variant="outline"
+                 size="sm"
+                 onClick={() => window.location.href = '/open-source-licenses'}
+                 className="rounded-md gap-1 text-sm"
+                >
+                 View
+                </Button>
+               </div>
+              </div>
+             </Card>
+            </section>
+      
+            {/* About */}
+            <section>
+             <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <Info size={18} className="text-blue-500" />
+              About
+             </h2>
+             <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
+              <div className="space-y-2">
+               <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                 <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white shadow-md">
+                  <ShieldCheck size={20} />
+                 </div>
+                 <div>
+                  <h3 className="text-sm font-medium">TaskFlow v{APP_VERSION}</h3>
+                  <p className="text-xs text-slate-500">Organize your life beautifully.</p>
+                 </div>
+                </div>
+                <Button
+                 variant="outline"
+                 size="sm"
+                 onClick={() => window.location.href = '/about'}
+                 className="rounded-md gap-1 text-sm"
+                >
+                 View
+                </Button>
+               </div>
+              </div>
+             </Card>
+            </section>
      </div>
     </div>
    </AppLayout>
