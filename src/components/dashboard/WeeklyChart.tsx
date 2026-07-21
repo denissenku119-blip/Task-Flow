@@ -3,17 +3,6 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
-import { useScreenshotMode } from '@/components/ScreenshotModeProvider';
-
-const SCREENSHOT_DATA = [
-  { day: 'Mon', completed: 4, fill: '#3B82F6' },
-  { day: 'Tue', completed: 6, fill: '#3B82F6' },
-  { day: 'Wed', completed: 3, fill: '#3B82F6' },
-  { day: 'Thu', completed: 8, fill: '#3B82F6' },
-  { day: 'Fri', completed: 5, fill: '#3B82F6' },
-  { day: 'Sat', completed: 7, fill: '#3B82F6' },
-  { day: 'Sun', completed: 2, fill: '#93C5FD' },
-];
 
 const REAL_EMPTY = [
   { day: 'Mon', completed: 0, fill: '#E2E8F0' },
@@ -26,20 +15,17 @@ const REAL_EMPTY = [
 ];
 
 const WeeklyChart = () => {
-  const { screenshotMode } = useScreenshotMode();
-  const data = screenshotMode ? SCREENSHOT_DATA : REAL_EMPTY;
-
   return (
     <Card className="p-5 border-slate-200 dark:border-slate-800 rounded-2xl">
       <h3 className="text-sm font-bold mb-4 text-slate-700 dark:text-slate-200">Weekly Productivity</h3>
       <div className="h-40 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
+          <BarChart data={REAL_EMPTY} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>
             <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} />
             <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} allowDecimals={false} />
             <Tooltip cursor={{ fill: 'rgba(59,130,246,0.08)' }} contentStyle={{ borderRadius: 12, border: 'none', fontSize: 12 }} />
             <Bar dataKey="completed" radius={[6, 6, 0, 0]} maxBarSize={32}>
-              {data.map((entry, index) => (
+              {REAL_EMPTY.map((entry, index) => (
                 <Cell key={index} fill={entry.fill} />
               ))}
             </Bar>

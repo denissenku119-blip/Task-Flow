@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
@@ -32,16 +30,14 @@ import { useTheme } from "next-themes";
 import { useTasks } from "@/hooks/use-tasks";
 import { showSuccess, showError } from "@/utils/toast";
 import { FilterOption, SortOption } from "@/types/task";
-import { useScreenshotMode } from "@/components/ScreenshotModeProvider";
 import {
- Sun, Moon, Monitor, Settings2, ShieldCheck, Trash2, Info, MessageSquare, Heart, FileText, BookOpen, Code, Shield, Camera, Terminal
+ Sun, Moon, Monitor, Settings2, ShieldCheck, Trash2, Info, MessageSquare, Heart, FileText, BookOpen, Code, Shield, Camera
 } from 'lucide-react';
 import { APP_VERSION } from '@/lib/appVersion';
 
 const Settings = () => {
  const { theme, setTheme } = useTheme();
  const { settings, updateSettings, resetData } = useTasks();
- const { screenshotMode, setScreenshotMode } = useScreenshotMode();
  const navigate = useNavigate();
  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -328,6 +324,7 @@ const Settings = () => {
         Supporter
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
+        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
         <div className="flex items-center gap-2.5">
          <div className="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center text-pink-500 shadow-md">
           <Heart size={20} />
@@ -431,33 +428,6 @@ const Settings = () => {
           View
          </Button>
         </div>
-       </Card>
-      </section>
-
-      {/* Developer */}
-      <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Terminal size={18} className="text-slate-500" />
-        Developer
-       </h2>
-       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
-        <div className="flex items-center justify-between">
-         <div className="space-y-0.5">
-          <Label className="text-sm flex items-center gap-1.5">
-           <Camera size={14} className="text-blue-500" />
-           Screenshot Mode
-          </Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Populate app with sample data and hide personal info for store listings.</p>
-         </div>
-         <Switch checked={screenshotMode} onCheckedChange={setScreenshotMode} />
-        </div>
-        {screenshotMode && (
-         <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
-          <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-           Screenshot Mode is ON. All pages now show demo data. Toggle off to return to your real tasks.
-          </p>
-         </div>
-        )}
        </Card>
       </section>
      </div>
