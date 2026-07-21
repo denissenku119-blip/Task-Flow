@@ -18,14 +18,12 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useScreenshotMode } from '@/components/ScreenshotModeProvider';
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
  const location = useLocation();
  const navigate = useNavigate();
  const { theme, setTheme } = useTheme();
  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
- const { screenshotMode } = useScreenshotMode();
 
  const isHome = location.pathname === '/';
 
@@ -48,11 +46,6 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
 
  return (
   <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row">
-   {screenshotMode && (
-    <div className="bg-amber-500 text-amber-950 text-xs font-bold text-center py-1.5 px-4 flex items-center justify-center gap-1.5">
-     <Camera size={12} /> SCREENSHOT MODE — Demo data active
-    </div>
-   )}
    <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 sticky top-0 h-screen z-30">
     <div className="flex items-center gap-2 mb-6 px-1">
      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-md shadow-blue-500/20">
@@ -96,6 +89,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     {isMobileMenuOpen && (
      <motion.div initial={{ opacity: 0, x: '100%' }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="md:hidden fixed inset-0 top-[56px] bg-white dark:bg-slate-900 z-40 p-4 flex flex-col">
       <nav className="space-y-2">
+       {nav className="space-y-2">
        {navItems.map((item) => (
         <Link key={item.path} to={item.path} onClick={() => setIsMobileMenuOpen(false)}>
          <Button variant="ghost" className={cn("w-full justify-start gap-3 h-12 text-base rounded-xl font-medium", location.pathname === item.path ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400" : "text-slate-500 dark:text-slate-400")}>

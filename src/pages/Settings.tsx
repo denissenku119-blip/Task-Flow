@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
@@ -36,26 +38,26 @@ import {
 import { APP_VERSION } from '@/lib/appVersion';
 
 const Settings = () => {
- const { theme, setTheme } = useTheme();
- const { settings, updateSettings, resetData } = useTasks();
- const navigate = useNavigate();
- const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const { theme, setTheme } = useTheme();
+  const { settings, updateSettings, resetData } = useTasks();
+  const navigate = useNavigate();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
- // Feedback form state
- const [feedbackType, setFeedbackType] = useState('');
- const [subject, setSubject] = useState('');
- const [message, setMessage] = useState('');
- const [rating, setRating] = useState(0);
- const [screenshot, setScreenshot] = useState<File | null>(null);
- const [isSubmitting, setIsSubmitting] = useState(false);
- const [lastSubmissionTime, setLastSubmissionTime] = useState(0);
+  // Feedback form state
+  const [feedbackType, setFeedbackType] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [rating, setRating] = useState(0);
+  const [screenshot, setScreenshot] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastSubmissionTime, setLastSubmissionTime] = useState(0);
 
- const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  if (file) {
-   if (!file.type.startsWith('image/')) {
-    showError('Please upload an image file');
-    return;
+  const handleScreenshotChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+     if (!file.type.startsWith('image/')) {
+      showError('Please upload an image file');
+      return;
    }
    if (file.size > 5 * 1024 * 1024) {
     showError('Image must be less than 5MB');
@@ -113,14 +115,14 @@ const Settings = () => {
     <div className="space-y-5">
       {/* Appearance */}
       <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Sun size={18} className="text-blue-500" />
-        Appearance
-       </h2>
-       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
-        <div className="flex items-center justify-between">
-         <div className="space-y-0.5">
-          <Label className="text-sm">Theme Mode</Label>
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <Sun size={18} className="text-blue-500" />
+         Appearance
+        </h2>
+        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
+         <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+           <Label className="text-sm">Theme Mode</Label>
           <p className="text-xs text-slate-500 dark:text-slate-400">Choose how TaskFlow looks to you.</p>
          </div>
          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
@@ -147,9 +149,9 @@ const Settings = () => {
 
       {/* Preferences */}
       <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Settings2 size={18} className="text-blue-500" />
-        Preferences
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <Settings2 size={18} className="text-blue-500" />
+         Preferences
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
         <div className="flex items-center justify-between">
@@ -195,15 +197,15 @@ const Settings = () => {
 
       {/* Feedback */}
       <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <MessageSquare size={18} className="text-blue-500" />
-        Feedback & Suggestions
-       </h2>
-       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-4">
-        <div className="space-y-1">
-         <Label className="text-sm">Help Improve TaskFlow</Label>
-         <p className="text-xs text-slate-500 dark:text-slate-400">We'd love to hear your ideas, bug reports and feature requests.</p>
-        </div>
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <MessageSquare size={18} className="text-blue-500" />
+         Feedback & Suggestions
+        </h2>
+        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-4">
+         <div className="space-y-1">
+          <Label className="text-sm">Help Improve TaskFlow</Label>
+          <p className="text-xs text-slate-500 dark:text-slate-400">We'd love to hear your ideas, bug reports and feature requests.</p>
+         </div>
         <div className="space-y-2">
          <Label className="text-sm">Feedback Type *</Label>
          <Select value={feedbackType} onValueChange={setFeedbackType}>
@@ -258,8 +260,8 @@ const Settings = () => {
 
       {/* Data Management */}
       <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <ShieldCheck size={18} className="text-blue-500" />
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <ShieldCheck size={18} className="text-blue-500" />
         Data & Privacy
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
@@ -295,8 +297,8 @@ const Settings = () => {
 
       {/* Support */}
       <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Heart size={18} className="text-pink-500" />
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <Heart size={18} className="text-pink-500" />
         Support TaskFlow
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
@@ -319,18 +321,17 @@ const Settings = () => {
 
       {/* Supporter */}
       <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Heart size={18} className="text-pink-500" />
-        Supporter
-       </h2>
-       <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <Heart size={18} className="text-pink-500" />
+         Supporter
+        </h2>
         <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
-        <div className="flex items-center gap-2.5">
-         <div className="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center text-pink-500 shadow-md">
-          <Heart size={20} />
-         </div>
-         <div>
-          <h3 className="text-sm font-medium">❤️ Supporter</h3>
+         <div className="flex items-center gap-2.5">
+          <div className="w-10 h-10 bg-pink-500/20 rounded-lg flex items-center justify-center text-pink-500 shadow-md">
+           <Heart size={20} />
+          </div>
+          <div>
+           <h3 className="text-sm font-medium">❤️ Supporter</h3>
           <p className="text-xs text-slate-500 dark:text-slate-400">This badge will only appear after Google Play confirms a successful donation.</p>
          </div>
         </div>
@@ -339,8 +340,8 @@ const Settings = () => {
 
       {/* About */}
       <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Info size={18} className="text-blue-500" />
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <Info size={18} className="text-blue-500" />
         About
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
@@ -361,8 +362,8 @@ const Settings = () => {
 
       {/* Privacy */}
       <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <FileText size={18} className="text-blue-500" />
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <FileText size={18} className="text-blue-500" />
         Privacy Policy
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
@@ -385,8 +386,8 @@ const Settings = () => {
 
       {/* Terms */}
       <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <BookOpen size={18} className="text-blue-500" />
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <BookOpen size={18} className="text-blue-500" />
         Terms of Service
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
@@ -409,8 +410,8 @@ const Settings = () => {
 
       {/* Licenses */}
       <section>
-       <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-        <Code size={18} className="text-blue-500" />
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <Code size={18} className="text-blue-500" />
         Open Source Licenses
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">

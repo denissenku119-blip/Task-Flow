@@ -263,17 +263,17 @@ export const useTasks = () => {
     const uniqueDates = [...new Set(completedDates)].sort((a, b) => a - b);
     let currentStreak = 0;
     let maxStreak = 0;
-    const today = startOfDay(new Date());
-    const yesterday = startOfDay(new Date(today.getTime() - 86400000)); // 24 hours in ms
+    const todayDate = startOfDay(new Date()); // Renamed from 'today' to avoid conflict
+    const yesterday = startOfDay(new Date(todayDate.getTime() - 86400000)); // 24 hours in ms
 
     // Check if we have a streak including today or yesterday
-    const hasToday = uniqueDates.some(date => date === today.getTime());
+    const hasToday = uniqueDates.some(date => date === todayDate.getTime());
     const hasYesterday = uniqueDates.some(date => date === yesterday.getTime());
 
     if (hasToday || hasYesterday) {
       // We have a current streak, calculate it
       const datesToCheck = uniqueDates.filter(date => 
-        date >= startOfDay(new Date(today.getTime() - 86400000 * 365)).getTime() // last year
+        date >= startOfDay(new Date(todayDate.getTime() - 86400000 * 365)).getTime() // last year
       ).sort((a, b) => a - b);
 
       let streak = 0;
