@@ -491,7 +491,31 @@
     "deviceOnly": "Tus datos permanecen solo en tu dispositivo",
     "uninstallRemove": "Puedes desinstalar la aplicación para eliminar todos los datos",
     "contact": "Contacto",
+    "contactText": "Para preguntas o consultas sobre privacidad, por favor contacta a:",
     "privacyEmail": "privacidad@taskflow.app"
+  },
+  "licenses": {
+    "intro": "{{count}} paquetes de código abierto usados en TaskFlow",
+    "footer": "TaskFlow está construido con ❤️ usando estos increíbles proyectos de código abierto. ¡Gracias a todos los mantenedores y colaboradores!",
+    "linkLabel": "Abrir sitio web de la biblioteca",
+    "libraries": {
+      "react": "Una biblioteca de JavaScript para construir interfaces de usuario",
+      "typescript": "TypeScript es un lenguaje para aplicaciones JavaScript a escala",
+      "vite": "Herramienta de desarrollo frontend de próxima generación",
+      "tailwindcss": "Un framework CSS basado en utilidades",
+      "radixui": "Biblioteca de componentes de interfaz accesibles y sin estilos",
+      "framermotion": "Biblioteca de animación lista para producción en React",
+      "zod": "Validación de esquemas basada en TypeScript",
+      "reacthookform": "Formularios performantes, flexibles y extensibles",
+      "reactquery": "Potente gestión de estado asíncrono",
+      "lucide": "Kit de iconos hermoso y consistente",
+      "datefns": "Biblioteca moderna de utilidades de fecha en JavaScript",
+      "recharts": "Biblioteca de gráficos redefinida construida con React y D3",
+      "nextthemes": "Modo oscuro perfecto en Next.js",
+      "i18next": "Framework de internacionalización",
+      "reacti18next": "Internacionalización para React",
+      "sonner": "Un componente de toast con opiniones"
+    }
   },
   "terms": {
     "title": "Términos de servicio",

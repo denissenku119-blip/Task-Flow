@@ -491,7 +491,31 @@
     "deviceOnly": "Your data remains on your device only",
     "uninstallRemove": "You can uninstall the app to remove all data",
     "contact": "Contact",
+    "contactText": "For privacy questions or concerns, please contact:",
     "privacyEmail": "privacy@taskflow.app"
+  },
+  "licenses": {
+    "intro": "{{count}} open source packages used in TaskFlow",
+    "footer": "TaskFlow is built with ❤️ using these amazing open source projects. Thank you to all the maintainers and contributors!",
+    "linkLabel": "Open library website",
+    "libraries": {
+      "react": "A JavaScript library for building user interfaces",
+      "typescript": "TypeScript is a language for application-scale JavaScript",
+      "vite": "Next generation frontend tooling",
+      "tailwindcss": "A utility-first CSS framework",
+      "radixui": "Unstyled, accessible UI component library",
+      "framermotion": "Production-ready motion library for React",
+      "zod": "TypeScript-first schema validation",
+      "reacthookform": "Performant, flexible and extensible forms",
+      "reactquery": "Powerful asynchronous state management",
+      "lucide": "Beautiful & consistent icon toolkit",
+      "datefns": "Modern JavaScript date utility library",
+      "recharts": "Redefined chart library built with React and D3",
+      "nextthemes": "Perfect dark mode in Next.js",
+      "i18next": "Internationalization framework",
+      "reacti18next": "Internationalization for React",
+      "sonner": "An opinionated toast component"
+    }
   },
   "terms": {
     "title": "Terms of Service",
