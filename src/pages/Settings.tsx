@@ -36,8 +36,11 @@ import {
  Sun, Moon, Monitor, Settings2, ShieldCheck, Trash2, Info, MessageSquare, Heart, FileText, BookOpen, Code, Shield, Camera
 } from 'lucide-react';
 import { APP_VERSION } from '@/lib/appVersion';
+import { useTranslation } from 'react-i18next';
+import { changeLanguage } from '@/i18n';
 
 const Settings = () => {
+  const { t } = useTranslation();
   const { theme, setTheme } = useTheme();
   const { settings, updateSettings, resetData } = useTasks();
   const navigate = useNavigate();
@@ -56,11 +59,11 @@ const Settings = () => {
     const file = e.target.files?.[0];
     if (file) {
      if (!file.type.startsWith('image/')) {
-      showError('Please upload an image file');
+      showError(t('settings.imageUploadError'));
       return;
    }
    if (file.size > 5 * 1024 * 1024) {
-    showError('Image must be less than 5MB');
+    showError(t('settings.imageSizeError'));
     return;
    }
    setScreenshot(file);
@@ -70,22 +73,22 @@ const Settings = () => {
  const handleSubmitFeedback = async () => {
   const now = Date.now();
   if (now - lastSubmissionTime < 5000) {
-   showError('Please wait before submitting again');
+   showError(t('settings.waitBeforeSubmit'));
    return;
   }
 
   if (!feedbackType || !subject || !message) {
-   showError('Please fill in all required fields');
+   showError(t('settings.fillAllFields'));
    return;
   }
 
   if (subject.length > 100) {
-   showError('Subject must be 100 characters or less');
+   showError(t('settings.subjectMax'));
    return;
   }
 
   if (message.length > 2000) {
-   showError('Message must be 2000 characters or less');
+   showError(t('settings.messageMax'));
    return;
   }
 
@@ -93,7 +96,7 @@ const Settings = () => {
 
   try {
    await new Promise(resolve => setTimeout(resolve, 1000));
-   showSuccess('Feedback submitted successfully!');
+   showSuccess(t('settings.feedbackSubmitted'));
    setFeedbackType('');
    setSubject('');
    setMessage('');
@@ -101,94 +104,123 @@ const Settings = () => {
    setScreenshot(null);
    setLastSubmissionTime(now);
   } catch (error) {
-   showError('Failed to submit feedback');
+   showError(t('settings.feedbackFailed'));
   } finally {
    setIsSubmitting(false);
   }
  };
 
+ const handleLanguageChange = (lang: string) => {
+  changeLanguage(lang);
+ };
+
  return (
   <AppLayout>
    <div className="max-w-2xl mx-auto px-4 py-4">
-    <h1 className="text-2xl font-bold tracking-tight mb-6">Settings</h1>
+    <h1 className="text-2xl font-bold tracking-tight mb-6">{t('settings.title')}</h1>
 
     <div className="space-y-5">
-      {/* Appearance */}
+      {/* Language */}
       <section>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-         <Sun size={18} className="text-blue-500" />
-         Appearance
+         <span className="text-2xl">🌐</span>
+         {t('settings.language')}
         </h2>
         <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
          <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-           <Label className="text-sm">Theme Mode</Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Choose how TaskFlow looks to you.</p>
+           <Label className="text-sm">{t('settings.language')}</Label>
+           <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.languageDescription')}</p>
+          </div>
+          <Select onValueChange={handleLanguageChange} defaultValue={localStorage.getItem('taskflow_language') || 'en'}>
+           <SelectTrigger className="w-[120px] rounded-md h-9">
+            <SelectValue className="text-sm" />
+           </SelectTrigger>
+           <SelectContent className="rounded-md">
+            <SelectItem value="en">English</SelectItem>
+            <SelectItem value="es">Español</SelectItem>
+           </SelectContent>
+          </Select>
          </div>
-         <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
-          <Button variant={theme === 'light' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTheme('light')} className="rounded-md gap-1 text-xs">
-           <Sun size={12} /> Light
-          </Button>
-          <Button variant={theme === 'dark' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTheme('dark')} className="rounded-md gap-1 text-xs">
-           <Moon size={12} /> Dark
-          </Button>
-          <Button variant={theme === 'system' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTheme('system')} className="rounded-md gap-1 text-xs">
-           <Monitor size={12} /> System
-          </Button>
+        </Card>
+      </section>
+
+      {/* Appearance */}
+      <section>
+        <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
+         <Sun size={18} className="text-blue-500" />
+         {t('settings.appearance')}
+        </h2>
+        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
+         <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+           <Label className="text-sm">{t('settings.themeMode')}</Label>
+           <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.themeDescription')}</p>
+          </div>
+          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+           <Button variant={theme === 'light' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTheme('light')} className="rounded-md gap-1 text-xs">
+            <Sun size={12} /> {t('settings.light')}
+           </Button>
+           <Button variant={theme === 'dark' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTheme('dark')} className="rounded-md gap-1 text-xs">
+            <Moon size={12} /> {t('settings.dark')}
+           </Button>
+           <Button variant={theme === 'system' ? 'secondary' : 'ghost'} size="sm" onClick={() => setTheme('system')} className="rounded-md gap-1 text-xs">
+            <Monitor size={12} /> {t('settings.systemTheme')}
+           </Button>
+          </div>
          </div>
-        </div>
-        <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
-         <div className="space-y-0.5">
-          <Label className="text-sm">Enable Animations</Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Smooth transitions and micro-interactions.</p>
+         <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+          <div className="space-y-0.5">
+           <Label className="text-sm">{t('settings.animations')}</Label>
+           <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.animationsDescription')}</p>
+          </div>
+          <Switch checked={settings.animationsEnabled} onCheckedChange={(val) => updateSettings({ animationsEnabled: val })} />
          </div>
-         <Switch checked={settings.animationsEnabled} onCheckedChange={(val) => updateSettings({ animationsEnabled: val })} />
-        </div>
-       </Card>
+        </Card>
       </section>
 
       {/* Preferences */}
       <section>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
          <Settings2 size={18} className="text-blue-500" />
-         Preferences
+         {t('settings.preferences')}
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
         <div className="flex items-center justify-between">
          <div className="space-y-0.5">
-          <Label className="text-sm">Default Filter</Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">The view you see when opening the app.</p>
+          <Label className="text-sm">{t('settings.defaultFilter')}</Label>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.defaultFilterDescription')}</p>
          </div>
          <Select value={settings.defaultFilter} onValueChange={(val) => updateSettings({ defaultFilter: val as FilterOption })}>
           <SelectTrigger className="w-[120px] rounded-md h-9">
            <SelectValue className="text-sm" />
           </SelectTrigger>
           <SelectContent className="rounded-md">
-           <SelectItem value="All">All Tasks</SelectItem>
-           <SelectItem value="Today">Today</SelectItem>
-           <SelectItem value="Upcoming">Upcoming</SelectItem>
-           <SelectItem value="Completed">Completed</SelectItem>
-           <SelectItem value="Pinned">Pinned</SelectItem>
-           <SelectItem value="Important">Important</SelectItem>
-           <SelectItem value="Archived">Archived</SelectItem>
+           <SelectItem value="All">{t('tasks.allTasks')}</SelectItem>
+           <SelectItem value="Today">{t('common.today')}</SelectItem>
+           <SelectItem value="Upcoming">{t('tasks.upcoming')}</SelectItem>
+           <SelectItem value="Completed">{t('tasks.completed')}</SelectItem>
+           <SelectItem value="Pinned">{t('dashboard.pinned')}</SelectItem>
+           <SelectItem value="Important">{t('tasks.important')}</SelectItem>
+           <SelectItem value="Archived">{t('tasks.archived')}</SelectItem>
           </SelectContent>
          </Select>
         </div>
         <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
          <div className="space-y-0.5">
-          <Label className="text-sm">Default Sorting</Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">How tasks are ordered by default.</p>
+          <Label className="text-sm">{t('settings.defaultSort')}</Label>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.defaultSortDescription')}</p>
          </div>
          <Select value={settings.defaultSort} onValueChange={(val) => updateSettings({ defaultSort: val as SortOption })}>
           <SelectTrigger className="w-[120px] rounded-md h-9">
            <SelectValue className="text-sm" />
           </SelectTrigger>
           <SelectContent className="rounded-md">
-           <SelectItem value="Newest">Newest</SelectItem>
-           <SelectItem value="Oldest">Oldest</SelectItem>
-           <SelectItem value="Alphabetical">Alphabetical</SelectItem>
-           <SelectItem value="Due Date">Due Date</SelectItem>
-           <SelectItem value="Priority">Priority</SelectItem>
+           <SelectItem value="Newest">{t('tasks.newest')}</SelectItem>
+           <SelectItem value="Oldest">{t('tasks.oldest')}</SelectItem>
+           <SelectItem value="Alphabetical">{t('tasks.alphabetical')}</SelectItem>
+           <SelectItem value="Due Date">{t('tasks.dueDate')}</SelectItem>
+           <SelectItem value="Priority">{t('tasks.priority')}</SelectItem>
           </SelectContent>
          </Select>
         </div>
@@ -199,41 +231,41 @@ const Settings = () => {
       <section>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
          <MessageSquare size={18} className="text-blue-500" />
-         Feedback & Suggestions
+         {t('settings.feedback')}
         </h2>
         <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-4">
          <div className="space-y-1">
-          <Label className="text-sm">Help Improve TaskFlow</Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">We'd love to hear your ideas, bug reports and feature requests.</p>
+          <Label className="text-sm">{t('settings.helpImprove')}</Label>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.feedbackDescription')}</p>
          </div>
         <div className="space-y-2">
-         <Label className="text-sm">Feedback Type *</Label>
+         <Label className="text-sm">{t('settings.feedbackType')} *</Label>
          <Select value={feedbackType} onValueChange={setFeedbackType}>
           <SelectTrigger className="rounded-md h-9">
-           <SelectValue placeholder="Select type" />
+           <SelectValue placeholder={t('settings.selectType')} />
           </SelectTrigger>
           <SelectContent className="rounded-md">
-           <SelectItem value="Feature Request">Feature Request</SelectItem>
-           <SelectItem value="Bug Report">Bug Report</SelectItem>
-           <SelectItem value="General Feedback">General Feedback</SelectItem>
-           <SelectItem value="UI/Design Suggestion">UI/Design Suggestion</SelectItem>
-           <SelectItem value="Performance Issue">Performance Issue</SelectItem>
-           <SelectItem value="Other">Other</SelectItem>
+           <SelectItem value="Feature Request">{t('settings.featureRequest')}</SelectItem>
+           <SelectItem value="Bug Report">{t('settings.bugReport')}</SelectItem>
+           <SelectItem value="General Feedback">{t('settings.generalFeedback')}</SelectItem>
+           <SelectItem value="UI/Design Suggestion">{t('settings.uiDesignSuggestion')}</SelectItem>
+           <SelectItem value="Performance Issue">{t('settings.performanceIssue')}</SelectItem>
+           <SelectItem value="Other">{t('settings.other')}</SelectItem>
           </SelectContent>
          </Select>
         </div>
         <div className="space-y-2">
-         <Label className="text-sm">Subject (max 100 chars) *</Label>
-         <Input placeholder="Brief title for your feedback" value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={100} className="rounded-md" />
+         <Label className="text-sm">{t('settings.subject')} (max 100 chars) *</Label>
+         <Input placeholder={t('settings.subjectPlaceholder')} value={subject} onChange={(e) => setSubject(e.target.value)} maxLength={100} className="rounded-md" />
          <p className="text-xs text-slate-400 text-right">{subject.length}/100</p>
         </div>
         <div className="space-y-2">
-         <Label className="text-sm">Message (max 2000 chars) *</Label>
-         <Textarea placeholder="Tell us what you love, what should be improved, or what new feature you'd like to see." value={message} onChange={(e) => setMessage(e.target.value)} maxLength={2000} className="rounded-md min-h-[100px] resize-none" />
+         <Label className="text-sm">{t('settings.message')} (max 2000 chars) *</Label>
+         <Textarea placeholder={t('settings.messagePlaceholder')} value={message} onChange={(e) => setMessage(e.target.value)} maxLength={2000} className="rounded-md min-h-[100px] resize-none" />
          <p className="text-xs text-slate-400 text-right">{message.length}/2000</p>
         </div>
         <div className="space-y-2">
-         <Label className="text-sm">Rating (Optional)</Label>
+         <Label className="text-sm">{t('settings.rating')}</Label>
          <div className="flex gap-1">
           {[1, 2, 3, 4, 5].map((star) => (
            <button key={star} onClick={() => setRating(star)} className={cn("w-8 h-8 rounded-full transition-colors", star <= rating ? "text-yellow-500" : "text-slate-300")}>
@@ -243,17 +275,17 @@ const Settings = () => {
          </div>
         </div>
         <div className="space-y-2">
-         <Label className="text-sm">Screenshot (Optional, max 5MB)</Label>
+         <Label className="text-sm">{t('settings.screenshot')}</Label>
          <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="rounded-md text-sm">
-           Attach Screenshot
+           {t('settings.attachScreenshot')}
           </Button>
           {screenshot && <span className="text-xs text-slate-500">{screenshot.name}</span>}
           <input type="file" ref={fileInputRef} onChange={handleScreenshotChange} accept="image/*" className="hidden" />
          </div>
         </div>
         <Button onClick={handleSubmitFeedback} disabled={isSubmitting || !feedbackType || !subject || !message} className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-md">
-         {isSubmitting ? 'Submitting...' : 'Send Feedback'}
+         {isSubmitting ? t('settings.submitting') : t('settings.sendFeedback')}
         </Button>
        </Card>
       </section>
@@ -262,31 +294,31 @@ const Settings = () => {
       <section>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
          <ShieldCheck size={18} className="text-blue-500" />
-        Data & Privacy
+        {t('settings.privacy')}
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl space-y-3">
         <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
          <div className="space-y-0.5">
-          <Label className="text-sm text-red-600">Reset All Data</Label>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Permanently delete all tasks and reset the application to its default state.</p>
+          <Label className="text-sm text-red-600">{t('settings.resetAllData')}</Label>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.resetDescription')}</p>
          </div>
          <AlertDialog>
           <AlertDialogTrigger asChild>
            <Button variant="destructive" className="rounded-md gap-1 text-sm">
-            <Trash2 size={14} /> Reset App
+            <Trash2 size={14} /> {t('settings.resetApp')}
            </Button>
           </AlertDialogTrigger>
           <AlertDialogContent className="rounded-lg">
            <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t('settings.resetConfirm')}</AlertDialogTitle>
             <AlertDialogDescription>
-             This action cannot be undone. This will permanently delete all your tasks and reset the application to its default state.
+             {t('settings.resetDescription')}
             </AlertDialogDescription>
            </AlertDialogHeader>
            <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-md">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-md">{t('settings.resetCancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={resetData} className="bg-red-600 hover:bg-red-700 rounded-md">
-             Yes, Reset Everything
+             {t('settings.resetConfirmButton')}
             </AlertDialogAction>
            </AlertDialogFooter>
           </AlertDialogContent>
@@ -299,7 +331,7 @@ const Settings = () => {
       <section>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
          <Heart size={18} className="text-pink-500" />
-        Support TaskFlow
+        {t('settings.support')}
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
         <div className="flex items-center justify-between">
@@ -308,12 +340,12 @@ const Settings = () => {
            <Heart size={20} />
           </div>
           <div>
-           <h3 className="text-sm font-medium">Support TaskFlow</h3>
-           <p className="text-xs text-slate-500 dark:text-slate-400">Optional donations to help TaskFlow grow</p>
+           <h3 className="text-sm font-medium">{t('settings.support')}</h3>
+           <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.supportDescription')}</p>
           </div>
          </div>
          <Button variant="outline" size="sm" onClick={() => navigate('/support')} className="rounded-md gap-1 text-sm">
-          View Support
+          {t('common.view')}
          </Button>
         </div>
        </Card>
@@ -323,7 +355,7 @@ const Settings = () => {
       <section>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
          <Heart size={18} className="text-pink-500" />
-         Supporter
+         {t('settings.supporter')}
         </h2>
         <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
          <div className="flex items-center gap-2.5">
@@ -331,8 +363,8 @@ const Settings = () => {
            <Heart size={20} />
           </div>
           <div>
-           <h3 className="text-sm font-medium">❤️ Supporter</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">This badge will only appear after Google Play confirms a successful donation.</p>
+           <h3 className="text-sm font-medium">❤️ {t('settings.supporter')}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.supporterDescription')}</p>
          </div>
         </div>
        </Card>
@@ -342,7 +374,7 @@ const Settings = () => {
       <section>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
          <Info size={18} className="text-blue-500" />
-        About
+        {t('settings.about')}
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
         <div className="flex items-center gap-2.5">
@@ -351,11 +383,11 @@ const Settings = () => {
          </div>
          <div>
           <h3 className="text-sm font-medium">TaskFlow v{APP_VERSION}</h3>
-          <p className="text-xs text-slate-500">Organize your life beautifully.</p>
+          <p className="text-xs text-slate-500">{t('about.missionDescription')}</p>
          </div>
         </div>
         <p className="text-xs text-slate-500 leading-relaxed mt-2">
-         TaskFlow is a modern, privacy-focused task management application. All your data is stored locally on your device and never leaves your browser.
+         {t('about.privacyDescription')}
         </p>
        </Card>
       </section>
@@ -364,7 +396,7 @@ const Settings = () => {
       <section>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
          <FileText size={18} className="text-blue-500" />
-        Privacy Policy
+        {t('settings.privacyPolicy')}
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
         <div className="flex items-center justify-between">
@@ -373,12 +405,12 @@ const Settings = () => {
            <Shield size={20} />
           </div>
           <div>
-           <h3 className="text-sm font-medium">Privacy Policy</h3>
-           <p className="text-xs text-slate-500 dark:text-slate-400">How we protect your data</p>
+           <h3 className="text-sm font-medium">{t('settings.privacyPolicy')}</h3>
+           <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.privacyDescription')}</p>
           </div>
          </div>
          <Button variant="outline" size="sm" onClick={() => navigate('/privacy')} className="rounded-md gap-1 text-sm">
-          View
+          {t('common.view')}
          </Button>
         </div>
        </Card>
@@ -388,7 +420,7 @@ const Settings = () => {
       <section>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
          <BookOpen size={18} className="text-blue-500" />
-        Terms of Service
+        {t('settings.termsOfService')}
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
         <div className="flex items-center justify-between">
@@ -397,12 +429,12 @@ const Settings = () => {
            <BookOpen size={20} />
           </div>
           <div>
-           <h3 className="text-sm font-medium">Terms of Service</h3>
-           <p className="text-xs text-slate-500 dark:text-slate-400">Usage terms and conditions</p>
+           <h3 className="text-sm font-medium">{t('settings.termsOfService')}</h3>
+           <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.termsDescription')}</p>
           </div>
          </div>
          <Button variant="outline" size="sm" onClick={() => navigate('/terms')} className="rounded-md gap-1 text-sm">
-          View
+          {t('common.view')}
          </Button>
         </div>
        </Card>
@@ -412,7 +444,7 @@ const Settings = () => {
       <section>
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
          <Code size={18} className="text-blue-500" />
-        Open Source Licenses
+        {t('settings.openSourceLicenses')}
        </h2>
        <Card className="p-4 border-slate-200 dark:border-slate-800 rounded-xl">
         <div className="flex items-center justify-between">
@@ -421,12 +453,12 @@ const Settings = () => {
            <Code size={20} />
           </div>
           <div>
-           <h3 className="text-sm font-medium">Open Source Licenses</h3>
-           <p className="text-xs text-slate-500 dark:text-slate-400">Third-party libraries used</p>
+           <h3 className="text-sm font-medium">{t('settings.openSourceLicenses')}</h3>
+           <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.openSourceDescription')}</p>
           </div>
          </div>
          <Button variant="outline" size="sm" onClick={() => navigate('/licenses')} className="rounded-md gap-1 text-sm">
-          View
+          {t('common.view')}
          </Button>
         </div>
        </Card>

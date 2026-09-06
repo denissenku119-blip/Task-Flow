@@ -18,6 +18,7 @@ import {
  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
+import { useTranslation } from 'react-i18next';
 
 const TIMER_STORAGE_KEY = 'taskflow_timer_duration_v2';
 
@@ -72,6 +73,7 @@ const playChime = () => {
 };
 
 const PomodoroTimer = () => {
+ const { t } = useTranslation();
  const [inputValues, setInputValues] = useState<SavedDuration>(() => loadSavedDuration());
  const [timeLeft, setTimeLeft] = useState<number>(() => {
   const s = toSeconds(loadSavedDuration());
@@ -104,7 +106,7 @@ const PomodoroTimer = () => {
   if (timeLeft === 0 && isActive) {
    setIsActive(false);
    if (!isMuted) playChime();
-   showSuccess("Focus Session Complete");
+   showSuccess(t('focus.sessionComplete'));
   }
  }, [timeLeft, isActive, isMuted]);
 
@@ -164,7 +166,7 @@ const PomodoroTimer = () => {
       <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600">
        <Zap size={16} />
       </div>
-      <h3 className="text-base font-bold">Focus Timer</h3>
+      <h3 className="text-base font-bold">{t('focus.title')}</h3>
      </div>
      <div className="flex items-center gap-1">
       <Button variant="ghost" size="icon" onClick={() => setIsMuted(!isMuted)} className="rounded-full text-slate-400 h-9 w-9">
@@ -183,7 +185,7 @@ const PomodoroTimer = () => {
        <motion.circle cx="112" cy="112" r="104" stroke="currentColor" strokeWidth="8" fill="transparent" strokeLinecap="round" strokeDasharray="653.45" initial={{ strokeDashoffset: 653.45 }} animate={{ strokeDashoffset: 653.45 * (1 - progress / 100) }} transition={{ duration: 0.5, ease: "linear" }} className="text-blue-600" />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">Remaining</span>
+       <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-1">{t('focus.remaining')}</span>
        <h2 className="text-5xl font-black tracking-tighter tabular-nums">{formatTime(timeLeft)}</h2>
       </div>
      </div>
@@ -191,7 +193,7 @@ const PomodoroTimer = () => {
      <div className="flex gap-3 w-full">
       <Button onClick={handleStartPause} className={cn("flex-1 h-12 rounded-xl text-base font-bold transition-all shadow-md active:scale-95", isActive ? "bg-slate-100 hover:bg-slate-200 text-slate-900 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700" : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20")}>
        {isActive ? <Pause className="mr-2 fill-current" /> : <Play className="mr-2 fill-current" />}
-       {isActive ? 'Pause' : timeLeft === 0 ? 'Resume' : 'Start'}
+       {isActive ? t('focus.pause') : timeLeft === 0 ? t('focus.resume') : t('focus.start')}
       </Button>
       <Button variant="outline" size="icon" onClick={handleReset} className="h-12 w-12 rounded-xl border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95">
        <RotateCcw size={20} />
@@ -199,7 +201,7 @@ const PomodoroTimer = () => {
      </div>
 
      <button onClick={openModal} className="mt-4 text-xs font-medium text-slate-400 hover:text-blue-600 transition-colors">
-      Set custom time (H : M : S)
+      {t('focus.setCustomTime')}
      </button>
     </div>
    </div>
@@ -209,28 +211,28 @@ const PomodoroTimer = () => {
      <DialogHeader>
       <DialogTitle className="flex items-center gap-2">
        <Settings2 size={18} className="text-blue-600" />
-       Set Timer Duration
+       {t('focus.setTimerDuration')}
       </DialogTitle>
      </DialogHeader>
      <div className="flex items-end justify-center gap-2 py-2">
       <div className="flex flex-col items-center">
        <Input type="number" min={0} max={99} value={draft.hours} onChange={(e) => setDraft((d) => ({ ...d, hours: clampField(e.target.value, 99) }))} className="w-20 text-center text-2xl font-bold h-14 rounded-xl tabular-nums" />
-       <span className="text-xs text-slate-400 mt-1">Hours</span>
+       <span className="text-xs text-slate-400 mt-1">{t('focus.hours')}</span>
       </div>
       <span className="text-2xl font-black text-slate-300 pb-6">:</span>
       <div className="flex flex-col items-center">
        <Input type="number" min={0} max={59} value={draft.minutes} onChange={(e) => setDraft((d) => ({ ...d, minutes: clampField(e.target.value, 59) }))} className="w-20 text-center text-2xl font-bold h-14 rounded-xl tabular-nums" />
-       <span className="text-xs text-slate-400 mt-1">Minutes</span>
+       <span className="text-xs text-slate-400 mt-1">{t('focus.minutes')}</span>
       </div>
       <span className="text-2xl font-black text-slate-300 pb-6">:</span>
       <div className="flex flex-col items-center">
        <Input type="number" min={0} max={59} value={draft.seconds} onChange={(e) => setDraft((d) => ({ ...d, seconds: clampField(e.target.value, 59) }))} className="w-20 text-center text-2xl font-bold h-14 rounded-xl tabular-nums" />
-       <span className="text-xs text-slate-400 mt-1">Seconds</span>
+       <span className="text-xs text-slate-400 mt-1">{t('focus.seconds')}</span>
       </div>
      </div>
      <DialogFooter className="gap-2">
-      <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="rounded-xl">Cancel</Button>
-      <Button onClick={applyDuration} className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6">Apply</Button>
+      <Button variant="ghost" onClick={() => setIsModalOpen(false)} className="rounded-xl">{t('common.cancel')}</Button>
+      <Button onClick={applyDuration} className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-6">{t('common.apply')}</Button>
      </DialogFooter>
     </DialogContent>
    </Dialog>

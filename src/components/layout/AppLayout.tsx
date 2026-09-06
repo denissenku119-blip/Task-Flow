@@ -17,20 +17,22 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
  const location = useLocation();
  const navigate = useNavigate();
  const { theme, setTheme } = useTheme();
  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+ const { t } = useTranslation();
 
  const isHome = location.pathname === '/';
 
  const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-  { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
-  { icon: CalendarIcon, label: 'Calendar', path: '/calendar' },
-  { icon: SettingsIcon, label: 'Settings', path: '/settings' },
+  { icon: LayoutDashboard, label: t('dashboard.title'), path: '/' },
+  { icon: CheckSquare, label: t('tasks.title'), path: '/tasks' },
+  { icon: CalendarIcon, label: t('calendar.title'), path: '/calendar' },
+  { icon: SettingsIcon, label: t('settings.title'), path: '/settings' },
  ];
 
  React.useEffect(() => {
@@ -66,7 +68,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="mt-auto pt-4 space-y-3 border-t border-slate-100 dark:border-slate-800">
      <Button variant="ghost" size="sm" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="w-full justify-start gap-2 h-10 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
       {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-      <span className="font-medium text-sm">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+      <span className="font-medium text-sm">{theme === 'dark' ? t('common.lightMode') : t('common.darkMode')}</span>
      </Button>
     </div>
    </aside>
@@ -98,7 +100,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
       </nav>
       <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
        <Button variant="outline" className="w-full h-12 rounded-xl gap-2 font-medium border-slate-200 dark:border-slate-800" onClick={() => { setTheme(theme === 'dark' ? 'light' : 'dark'); setIsMobileMenuOpen(false); }}>
-        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />} Toggle Theme
+        {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />} {t('common.toggleTheme')}
        </Button>
       </div>
      </motion.div>
@@ -110,7 +112,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
      {!isHome && (
       <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="hidden md:block">
        <Button variant="ghost" onClick={() => navigate(-1)} className="rounded-lg gap-1.5 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-slate-100">
-        <ArrowLeft size={16} /> Back
+        <ArrowLeft size={16} /> {t('common.back')}
        </Button>
       </motion.div>
      )}

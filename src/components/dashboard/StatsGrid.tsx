@@ -10,6 +10,7 @@ import {
  TrendingUp
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface StatsGridProps {
  stats: {
@@ -21,36 +22,37 @@ interface StatsGridProps {
 }
 
 const StatsGrid = ({ stats }: StatsGridProps) => {
- const items = [
-  {
-   label: 'Total Tasks',
-   value: stats.total,
-   icon: ListTodo,
-   color: 'text-blue-600',
-   bg: 'bg-blue-50 dark:bg-blue-900/20'
-  },
-  {
-   label: 'Completed',
-   value: stats.completed,
-   icon: CheckCircle2,
-   color: 'text-green-600',
-   bg: 'bg-green-50 dark:bg-green-900/20'
-  },
-  {
-   label: 'Pending',
-   value: stats.pending,
-   icon: Clock,
-   color: 'text-orange-600',
-   bg: 'bg-orange-50 dark:bg-orange-900/20'
-  },
-  {
-   label: 'Completion',
-   value: `${stats.percentage}%`,
-   icon: TrendingUp,
-   color: 'text-purple-600',
-   bg: 'bg-purple-50 dark:bg-purple-900/20'
-  },
- ];
+  const { t } = useTranslation();
+  const items = [
+   {
+    label: t('stats.totalTasks'),
+    value: stats.total,
+    icon: ListTodo,
+    color: 'text-blue-600',
+    bg: 'bg-blue-50 dark:bg-blue-900/20'
+   },
+   {
+    label: t('stats.completed'),
+    value: stats.completed,
+    icon: CheckCircle2,
+    color: 'text-green-600',
+    bg: 'bg-green-50 dark:bg-green-900/20'
+   },
+   {
+    label: t('stats.pending'),
+    value: stats.pending,
+    icon: Clock,
+    color: 'text-orange-600',
+    bg: 'bg-orange-50 dark:bg-orange-900/20'
+   },
+   {
+    label: t('stats.completion'),
+    value: `${stats.percentage}%`,
+    icon: TrendingUp,
+    color: 'text-purple-600',
+    bg: 'bg-purple-50 dark:bg-purple-900/20'
+   },
+  ];
 
  return (
   <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -71,7 +73,7 @@ const StatsGrid = ({ stats }: StatsGridProps) => {
       <h3 className="text-3xl font-black text-slate-900 dark:text-slate-100 leading-none tabular-nums">
        {item.value}
       </h3>
-      {item.label === 'Completion' && (
+      {item.label === t('stats.completion') && (
        <div className="mt-3">
         <Progress value={stats.percentage} className="h-1.5 bg-slate-100 dark:bg-slate-800" />
        </div>

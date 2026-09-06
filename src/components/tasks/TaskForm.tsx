@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { useTranslation } from 'react-i18next';
 
 const taskSchema = z.object({
   title: z.string().min(1, "Title is required").max(100),
@@ -52,6 +53,7 @@ interface TaskFormProps {
 }
 
 const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => {
+  const { t } = useTranslation();
   const form = useForm<z.infer<typeof taskSchema>>({
     resolver: zodResolver(taskSchema),
     defaultValues: initialData ? {
@@ -117,7 +119,7 @@ const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => 
       <DialogContent className="sm:max-w-[500px] rounded-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            {initialData ? 'Edit Task' : 'Create New Task'}
+            {initialData ? t('tasks.editTask') : t('tasks.createTask')}
           </DialogTitle>
         </DialogHeader>
         
@@ -128,9 +130,9 @@ const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => 
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>{t('tasks.title')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="What needs to be done?" {...field} className="rounded-xl" />
+                    <Input placeholder={t('tasks.addDetails')} {...field} className="rounded-xl" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -142,10 +144,10 @@ const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => 
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormLabel>{t('tasks.descriptionOptional')}</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Add some details..." 
+                      placeholder={t('tasks.addDetails')} 
                       className="resize-none rounded-xl min-h-[100px]" 
                       {...field} 
                     />
@@ -161,7 +163,7 @@ const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => 
                 name="dueDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Due Date</FormLabel>
+                    <FormLabel>{t('tasks.dueDate')}</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} className="rounded-xl" />
                     </FormControl>
@@ -175,9 +177,9 @@ const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => 
                 name="estimatedDuration"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Duration (e.g. 30m)</FormLabel>
+                    <FormLabel>{t('tasks.durationExample')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="30m, 1h..." {...field} className="rounded-xl" />
+                      <Input placeholder={t('tasks.durationExample')} {...field} className="rounded-xl" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -191,18 +193,18 @@ const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => 
                 name="priority"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Priority</FormLabel>
+                    <FormLabel>{t('tasks.priority')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="rounded-xl">
-                          <SelectValue placeholder="Select priority" />
+                          <SelectValue placeholder={t('tasks.selectPriority')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="rounded-xl">
-                        <SelectItem value="Low">Low</SelectItem>
-                        <SelectItem value="Medium">Medium</SelectItem>
-                        <SelectItem value="High">High</SelectItem>
-                        <SelectItem value="Urgent">Urgent</SelectItem>
+                        <SelectItem value="Low">{t('tasks.low')}</SelectItem>
+                        <SelectItem value="Medium">{t('tasks.medium')}</SelectItem>
+                        <SelectItem value="High">{t('tasks.high')}</SelectItem>
+                        <SelectItem value="Urgent">{t('tasks.urgent')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -215,21 +217,21 @@ const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => 
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>{t('tasks.category')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="rounded-xl">
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder={t('tasks.selectCategory')} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent className="rounded-xl">
-                        <SelectItem value="Personal">Personal</SelectItem>
-                        <SelectItem value="Work">Work</SelectItem>
-                        <SelectItem value="School">School</SelectItem>
-                        <SelectItem value="Health">Health</SelectItem>
-                        <SelectItem value="Finance">Finance</SelectItem>
-                        <SelectItem value="Shopping">Shopping</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
+                        <SelectItem value="Personal">{t('tasks.personal')}</SelectItem>
+                        <SelectItem value="Work">{t('tasks.work')}</SelectItem>
+                        <SelectItem value="School">{t('tasks.school')}</SelectItem>
+                        <SelectItem value="Health">{t('tasks.health')}</SelectItem>
+                        <SelectItem value="Finance">{t('tasks.finance')}</SelectItem>
+                        <SelectItem value="Shopping">{t('tasks.shopping')}</SelectItem>
+                        <SelectItem value="Other">{t('tasks.other')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -247,7 +249,7 @@ const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => 
                     <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
-                    <FormLabel className="cursor-pointer">Pin Task</FormLabel>
+                    <FormLabel className="cursor-pointer">{t('tasks.pinTask')}</FormLabel>
                   </FormItem>
                 )}
               />
@@ -259,7 +261,7 @@ const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => 
                     <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
-                    <FormLabel className="cursor-pointer">Important</FormLabel>
+                    <FormLabel className="cursor-pointer">{t('tasks.important')}</FormLabel>
                   </FormItem>
                 )}
               />
@@ -267,10 +269,10 @@ const TaskForm = ({ isOpen, onClose, onSubmit, initialData }: TaskFormProps) => 
 
             <DialogFooter className="pt-4">
               <Button type="button" variant="ghost" onClick={onClose} className="rounded-xl">
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" className="bg-blue-600 hover:bg-blue-700 rounded-xl px-8">
-                {initialData ? 'Save Changes' : 'Create Task'}
+                {initialData ? t('tasks.saveChanges') : t('tasks.createTask')}
               </Button>
             </DialogFooter>
           </form>

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 const REAL_EMPTY = [
   { day: 'Mon', completed: 0, fill: '#E2E8F0' },
@@ -15,9 +16,10 @@ const REAL_EMPTY = [
 ];
 
 const WeeklyChart = () => {
+  const { t } = useTranslation();
   return (
     <Card className="p-5 border-slate-200 dark:border-slate-800 rounded-2xl">
-      <h3 className="text-sm font-bold mb-4 text-slate-700 dark:text-slate-200">Weekly Productivity</h3>
+      <h3 className="text-sm font-bold mb-4 text-slate-700 dark:text-slate-200">{t('dashboard.weeklyProductivity')}</h3>
       <div className="h-40 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={REAL_EMPTY} margin={{ top: 4, right: 4, left: -24, bottom: 0 }}>

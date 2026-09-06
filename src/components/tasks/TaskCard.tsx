@@ -21,6 +21,7 @@ import { format, parseISO, isBefore, startOfDay } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { Progress } from '@/components/ui/progress';
+import { useTranslation } from 'react-i18next';
 
 interface TaskCardProps {
  task: Task;
@@ -41,12 +42,13 @@ const TaskCard = ({
  onTogglePin, 
  onToggleImportant, 
  onToggleArchive, 
- onDuplicate 
+ onDuplicate
 }: TaskCardProps) => {
+ const { t, i18n } = useTranslation();
  const isOverdue = !task.isCompleted && isBefore(parseISO(task.dueDate), startOfDay(new Date()));
  
- const subtaskProgress = task.subtasks.length > 0 
-  ? (task.subtasks.filter(s => s.isCompleted).length / task.subtasks.length) * 100 
+ const subtaskProgress = task.subtasks.length > 0
+  ? (task.subtasks.filter(s => s.isCompleted).length / task.subtasks.length) * 100
   : 0;
 
  const priorityColors = {
@@ -95,14 +97,14 @@ const TaskCard = ({
 
       <div className="flex flex-wrap items-center gap-2 mb-2">
        <Badge variant="secondary" className={cn("rounded-lg px-1.5 py-0", priorityColors[task.priority])}>
-        {task.priority}
+        {t(`tasks.${task.priority.toLowerCase()}`)}
        </Badge>
        <div className={cn(
         "flex items-center gap-1 text-xs",
         isOverdue ? "text-red-400" : "text-slate-400"
        )}>
         <Calendar size={12} />
-        {format(parseISO(task.dueDate), 'MMM d')}
+        {format(parseISO(task.dueDate), i18n.language === 'es' ? 'MMM d' : 'MMM d')}
        </div>
        {task.subtasks.length > 0 && (
         <div className="flex items-center gap-1 text-xs text-slate-400">
@@ -125,23 +127,23 @@ const TaskCard = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="rounded-md w-44">
        <DropdownMenuItem onClick={() => onEdit(task)} className="gap-1.5 px-2 py-1">
-        <Edit2 size={12} /> Edit
+        <Edit2 size={12} /> {t('tasks.edit')}
        </DropdownMenuItem>
        <DropdownMenuItem onClick={() => onTogglePin(task.id)} className="gap-1.5 px-2 py-1">
-        <Pin size={12} /> {task.isPinned ? 'Unpin' : 'Pin'}
+        <Pin size={12} /> {task.isPinned ? t('tasks.unpin') : t('tasks.pin')}
        </DropdownMenuItem>
        <DropdownMenuItem onClick={() => onToggleImportant(task.id)} className="gap-1.5 px-2 py-1">
-        <Star size={12} /> {task.isImportant ? 'Unmark' : 'Mark Important'}
+        <Star size={12} /> {task.isImportant ? t('tasks.unmarkImportant') : t('tasks.markImportant')}
        </DropdownMenuItem>
        <DropdownMenuItem onClick={() => onDuplicate(task.id)} className="gap-1.5 px-2 py-1">
-        <Copy size={12} /> Duplicate
+        <Copy size={12} /> {t('tasks.duplicate')}
        </DropdownMenuItem>
        <DropdownMenuSeparator className="mx-1 my-0.5" />
        <DropdownMenuItem onClick={() => onToggleArchive(task.id)} className="gap-1.5 px-2 py-1">
-        <Archive size={12} /> {task.isArchived ? 'Unarchive' : 'Archive'}
+        <Archive size={12} /> {task.isArchived ? t('tasks.unarchive') : t('tasks.archive')}
        </DropdownMenuItem>
        <DropdownMenuItem onClick={() => onDelete(task.id)} className="text-red-500 gap-1.5 px-2 py-1">
-        <Trash2 size={12} /> Delete
+        <Trash2 size={12} /> {t('tasks.delete')}
        </DropdownMenuItem>
       </DropdownMenuContent>
      </DropdownMenu>
