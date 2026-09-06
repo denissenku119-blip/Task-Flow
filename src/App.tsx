@@ -16,6 +16,8 @@ import NotFound from "./pages/NotFound";
 import { useLanguage, changeLanguage, hasSelectedLanguage, setLanguageSelected } from "./hooks/use-language";
 import { useEffect, useState } from "react";
 
+const queryClient = new QueryClient();
+
 const App = () => {
   const { t, i18n, currentLanguage } = useLanguage();
   const [hasCompletedFirstLaunch, setHasCompletedFirstLaunch] = useState(false);

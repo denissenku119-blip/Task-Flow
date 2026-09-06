@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Task, SortOption, FilterOption, Category, Priority, AppSettings } from '@/types/task';
-import { 
-  isToday, isAfter, isBefore, parseISO, startOfDay, 
-  isSameDay, format 
+import {
+  isAfter, isBefore, parseISO, startOfDay,
+  isSameDay, format
 } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 import { showSuccess, showError } from '@/utils/toast';
 
 const STORAGE_KEY = 'taskflow_tasks_v2';
@@ -23,6 +24,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 };
 
 export const useTasks = () => {
+  const { t } = useTranslation();
   const [tasks, setTasks] = useState<Task[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved) : [];
@@ -54,7 +56,7 @@ export const useTasks = () => {
 
   const updateSettings = (updates: Partial<AppSettings>) => {
     setSettings(prev => ({ ...prev, ...updates }));
-    showSuccess("Settings updated");
+    showSuccess(t('settings.settingsUpdated'));
   };
 
   const resetData = () => {
@@ -62,7 +64,7 @@ export const useTasks = () => {
     setSettings(DEFAULT_SETTINGS);
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(SETTINGS_KEY);
-    showSuccess("All data has been reset");
+    showSuccess(t('settings.allDataReset'));
     window.location.reload();
   };
 
@@ -74,7 +76,7 @@ export const useTasks = () => {
     link.href = url;
     link.download = `taskflow_backup_${format(new Date(), 'yyyy-MM-dd')}.json`;
     link.click();
-    showSuccess("Data exported successfully");
+    showSuccess(t('settings.dataExported'));
   };
 
   const importData = (jsonString: string) => {
@@ -82,9 +84,9 @@ export const useTasks = () => {
       const data = JSON.parse(jsonString);
       if (data.tasks) setTasks(data.tasks);
       if (data.settings) setSettings(data.settings);
-      showSuccess("Data imported successfully");
+      showSuccess(t('settings.dataImported'));
     } catch (e) {
-      showError("Invalid backup file");
+      showError(t('settings.invalidBackup'));
     }
   };
 
@@ -92,7 +94,7 @@ export const useTasks = () => {
     saveToHistory();
     const newTask: Task = {
       id: crypto.randomUUID(),
-      title: taskData.title || 'New Task',
+      title: taskData.title || t('tasks.newTask'),
       description: taskData.description || '',
       dueDate: taskData.dueDate || new Date().toISOString(),
       createdAt: new Date().toISOString(),
@@ -113,12 +115,12 @@ export const useTasks = () => {
       ...taskData
     };
     setTasks(prev => [newTask, ...prev]);
-    showSuccess("Task created");
+    showSuccess(t('tasks.taskCreated'));
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
     saveToHistory();
-    setTasks(prev => prev.map(task => 
+    setTasks(prev => prev.map(task =>
       task.id === id ? { ...task, ...updates, lastEdited: new Date().toISOString() } : task
     ));
   };
@@ -126,7 +128,7 @@ export const useTasks = () => {
   const deleteTask = (id: string) => {
     saveToHistory();
     setTasks(prev => prev.filter(task => task.id !== id));
-    showSuccess("Task deleted");
+    showSuccess(t('tasks.taskDeleted'));
   };
 
   const duplicateTask = (id: string) => {
@@ -142,14 +144,14 @@ export const useTasks = () => {
       isCompleted: false
     };
     setTasks(prev => [newTask, ...prev]);
-    showSuccess("Task duplicated");
+    showSuccess(t('tasks.taskDuplicated'));
   };
 
   const toggleComplete = (id: string) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
     updateTask(id, { isCompleted: !task.isCompleted });
-    if (!task.isCompleted) showSuccess("Task completed!");
+    if (!task.isCompleted) showSuccess(t('tasks.taskCompleted'));
   };
 
   const togglePin = (id: string) => {
@@ -175,8 +177,8 @@ export const useTasks = () => {
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(t => 
-        t.title.toLowerCase().includes(query) || 
+      result = result.filter(t =>
+        t.title.toLowerCase().includes(query) ||
         t.description.toLowerCase().includes(query) ||
         t.category.toLowerCase().includes(query)
       );
@@ -246,7 +248,7 @@ export const useTasks = () => {
     const completed = active.filter(t => t.isCompleted).length;
     const total = active.length;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-    
+
     const today = startOfDay(new Date());
     const todayTasks = active.filter(t => isSameDay(parseISO(t.dueDate), today));
     const overdueTasks = active.filter(t => !t.isCompleted && isBefore(parseISO(t.dueDate), today));
@@ -272,7 +274,7 @@ export const useTasks = () => {
 
     if (hasToday || hasYesterday) {
       // We have a current streak, calculate it
-      const datesToCheck = uniqueDates.filter(date => 
+      const datesToCheck = uniqueDates.filter(date =>
         date >= startOfDay(new Date(todayDate.getTime() - 86400000 * 365)).getTime() // last year
       ).sort((a, b) => a - b);
 

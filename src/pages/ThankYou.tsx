@@ -1,41 +1,43 @@
 "use client";
 
-import React from "react";
-import { Card } from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import AppLayout from '@/components/layout/AppLayout';
+import { Button } from '@/components/ui/button';
+import { Home } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
-const ThankYouScreen = () => {
+const ThankYou = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 py-4">
-      <Card className="p-8 text-center bg-white dark:bg-slate-800 rounded-xl shadow-sm max-w-md">
-        <div className="mb-6">
-          <CheckCircle2 size={48} className="text-green-500 mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            🎉 Thank You!
-          </h2>
-        </div>
-        
-        <div className="mb-6 text-gray-600 dark:text-slate-400 leading-relaxed">
-          <p>
-            Your support truly means a lot.
+    <AppLayout>
+      <div className="max-w-2xl mx-auto px-4 py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="text-center"
+        >
+          <div className="text-6xl font-black text-blue-500 mb-2">✓</div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+            {t('common.thankYou')}
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 mb-6">
+            {t('common.thankYouDescription')}
           </p>
-          <p>
-            Every contribution helps improve TaskFlow, build new features, fix bugs and keep the 
-            app free for everyone.
-          </p>
-          <p className="mt-4">
-            Thank you for being part of the TaskFlow journey.
-          </p>
-        </div>
-        
-        <div className="text-center">
-          <div className="text-4xl text-gray-900 dark:text-white">
-            ❤️
-          </div>
-        </div>
-      </Card>
-    </div>
+          <Button
+            onClick={() => navigate('/')}
+            className="rounded-xl gap-1 bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Home size={16} />
+            {t('common.goHome')}
+          </Button>
+        </motion.div>
+      </div>
+    </AppLayout>
   );
 };
 
-export default ThankYouScreen;
+export default ThankYou;
