@@ -2,17 +2,17 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckSquare, Globe } from 'lucide-react';
+import { CheckSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { setLanguageSelected } from '@/i18n';
+import { setLanguageSelected, SUPPORTED_LANGUAGES } from '@/i18n';
 
 interface LanguageSelectorProps {
   onLanguageSelect: (lang: string) => void;
 }
 
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onLanguageSelect }) => {
-  const handleSelect = (lang: string) => {
-    setLanguageSelected(lang);
+  const handleSelect = async (lang: string) => {
+    await setLanguageSelected(lang);
     onLanguageSelect(lang);
   };
 
@@ -22,7 +22,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onLanguageSelect })
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="w-full max-w-md"
+        className="w-full max-w-2xl"
       >
         <div className="text-center mb-8">
           <motion.div
@@ -41,36 +41,24 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({ onLanguageSelect })
           </p>
         </div>
 
-        <div className="space-y-3">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2, duration: 0.4, ease: "easeOut" }}
-          >
-            <Button
-              onClick={() => handleSelect('en')}
-              className="w-full h-16 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-left px-5 gap-3 text-base font-medium transition-all duration-200 group"
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto px-1">
+          {SUPPORTED_LANGUAGES.map((lang, index) => (
+            <motion.div
+              key={lang.code}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 + index * 0.02, duration: 0.3, ease: "easeOut" }}
             >
-              <span className="text-2xl">🇬🇧</span>
-              <span className="flex-1">English</span>
-              <Globe size={16} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
-            </Button>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3, duration: 0.4, ease: "easeOut" }}
-          >
-            <Button
-              onClick={() => handleSelect('es')}
-              className="w-full h-16 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-left px-5 gap-3 text-base font-medium transition-all duration-200 group"
-            >
-              <span className="text-2xl">🇪🇸</span>
-              <span className="flex-1">Español</span>
-              <Globe size={16} className="text-slate-400 group-hover:text-blue-600 transition-colors" />
-            </Button>
-          </motion.div>
+              <Button
+                onClick={() => handleSelect(lang.code)}
+                variant="outline"
+                className="w-full h-14 rounded-xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-left px-4 gap-3 text-base font-medium transition-all duration-200"
+              >
+                <span className="text-2xl shrink-0">{lang.flag}</span>
+                <span className="flex-1 truncate">{lang.nativeName}</span>
+              </Button>
+            </motion.div>
+          ))}
         </div>
 
         <motion.div

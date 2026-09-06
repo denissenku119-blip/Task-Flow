@@ -1,30 +1,35 @@
 import { useTranslation } from 'react-i18next';
-import i18n, { changeLanguage as i18nChangeLanguage, hasSelectedLanguage, setLanguageSelected } from '../i18n';
+import i18n, {
+  changeLanguage as i18nChangeLanguage,
+  hasSelectedLanguage as i18nHasSelectedLanguage,
+  setLanguageSelected as i18nSetLanguageSelected,
+  SUPPORTED_LANGUAGES,
+  isRtl,
+  type SupportedLanguage,
+} from '../i18n';
 
 const LANGUAGE_KEY = 'taskflow_language';
 
 export const useLanguage = () => {
   const { t, i18n: i18nInstance } = useTranslation();
 
-  const currentLanguage = i18nInstance.language;
+  const currentLanguage: SupportedLanguage = (i18nInstance.language || 'en') as SupportedLanguage;
 
-  const changeLanguage = (lang: string) => {
-    i18nChangeLanguage(lang);
-    setLanguageSelected(lang);
+  const changeLanguage = async (lang: string) => {
+    await i18nChangeLanguage(lang);
   };
-
-  const isEnglish = currentLanguage === 'en';
-  const isSpanish = currentLanguage === 'es';
 
   return {
     t,
     i18n: i18nInstance,
     currentLanguage,
     changeLanguage,
-    isEnglish,
-    isSpanish,
-    setLanguageSelected,
-    hasSelectedLanguage,
+    isEnglish: currentLanguage === 'en',
+    isSpanish: currentLanguage === 'es',
+    isRtl: isRtl(currentLanguage),
+    setLanguageSelected: i18nSetLanguageSelected,
+    hasSelectedLanguage: i18nHasSelectedLanguage,
+    supportedLanguages: SUPPORTED_LANGUAGES,
   };
 };
 
@@ -34,7 +39,7 @@ export const getSavedLanguage = (): string => {
 };
 
 export const changeLanguage = (lang: string) => {
-  i18nChangeLanguage(lang);
+  return i18nChangeLanguage(lang);
 };
 
-export { hasSelectedLanguage, setLanguageSelected };
+export { hasSelectedLanguage, setLanguageSelected } from '../i18n';

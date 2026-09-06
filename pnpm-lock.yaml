@@ -128,6 +128,9 @@ importers:
       i18next:
         specifier: ^26.4.2
         version: 26.4.2(typescript@5.9.3)
+      i18next-http-backend:
+        specifier: ^4.0.2
+        version: 4.0.2
       input-otp:
         specifier: ^1.2.4
         version: 1.4.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -2579,6 +2582,10 @@ packages:
   html2canvas@1.4.1:
     resolution: {integrity: sha512-fPU6BHNpsyIhr8yyMpTLLxAbkaK8ArIBcmZIRiBLiDhjeqvXolaEmDGmELFuX9I4xDcaKKcJl+TKZLqruBbmWA==}
     engines: {node: '>=8.0.0'}
+
+  i18next-http-backend@4.0.2:
+    resolution: {integrity: sha512-oay62dIB2kL7+WHzoUXBjWfL3+mwijD3pQkQkIEaRLhy6kjXxUhrRenV0gInwlCASAaJaDy94+XvYizK+cAGdA==}
+    engines: {node: '>=18'}
 
   i18next@26.4.2:
     resolution: {integrity: sha512-RX+R0VLg13IbvRuJSxnqykUFS9vQZTl8wYpWPCIUDWVrSGjsQywB5Y+pjzrkboxGAuYfJZVH1InFTdgBdxq6ug==}
@@ -6555,6 +6562,8 @@ snapshots:
       css-line-break: 2.1.0
       text-segmentation: 1.0.3
     optional: true
+
+  i18next-http-backend@4.0.2: {}
 
   i18next@26.4.2(typescript@5.9.3):
     optionalDependencies:
