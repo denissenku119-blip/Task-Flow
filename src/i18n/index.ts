@@ -1,6 +1,21 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import HttpBackend from 'i18next-http-backend';
+
+import en from './locales/en/translation.json';
+import es from './locales/es/translation.json';
+import zh from './locales/zh/translation.json';
+import hi from './locales/hi/translation.json';
+import ar from './locales/ar/translation.json';
+import fr from './locales/fr/translation.json';
+import bn from './locales/bn/translation.json';
+import pt from './locales/pt/translation.json';
+import id from './locales/id/translation.json';
+import ur from './locales/ur/translation.json';
+import ru from './locales/ru/translation.json';
+import de from './locales/de/translation.json';
+import ja from './locales/ja/translation.json';
+import tr from './locales/tr/translation.json';
+import ko from './locales/ko/translation.json';
 
 const LANGUAGE_KEY = 'taskflow_language';
 export const RTL_LANGUAGES = ['ar', 'ur'] as const;
@@ -45,13 +60,28 @@ const applyDocumentDirection = (lng: string) => {
   document.documentElement.setAttribute('lang', lng);
 };
 
+const resources = {
+  en: { translation: en },
+  es: { translation: es },
+  zh: { translation: zh },
+  hi: { translation: hi },
+  ar: { translation: ar },
+  fr: { translation: fr },
+  bn: { translation: bn },
+  pt: { translation: pt },
+  id: { translation: id },
+  ur: { translation: ur },
+  ru: { translation: ru },
+  de: { translation: de },
+  ja: { translation: ja },
+  tr: { translation: tr },
+  ko: { translation: ko },
+};
+
 i18n
-  .use(HttpBackend)
   .use(initReactI18next)
   .init({
-    backend: {
-      loadPath: '/locales/{{lng}}/translation.json',
-    },
+    resources,
     lng: getSavedLanguage(),
     fallbackLng: 'en',
     supportedLngs: SUPPORTED_LANGUAGES.map(l => l.code),

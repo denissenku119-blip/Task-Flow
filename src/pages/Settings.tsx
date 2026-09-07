@@ -37,7 +37,7 @@ import {
 } from 'lucide-react';
 import { APP_VERSION } from '@/lib/appVersion';
 import { useTranslation } from 'react-i18next';
-import { changeLanguage } from '@/i18n';
+import { changeLanguage, SUPPORTED_LANGUAGES } from '@/i18n';
 
 const Settings = () => {
   const { t } = useTranslation();
@@ -133,12 +133,15 @@ const Settings = () => {
            <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.languageDescription')}</p>
           </div>
           <Select onValueChange={handleLanguageChange} defaultValue={localStorage.getItem('taskflow_language') || 'en'}>
-           <SelectTrigger className="w-[120px] rounded-md h-9">
+           <SelectTrigger className="w-[200px] rounded-md h-9">
             <SelectValue className="text-sm" />
            </SelectTrigger>
-           <SelectContent className="rounded-md">
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="es">Español</SelectItem>
+           <SelectContent className="rounded-md max-h-[60vh]">
+            {SUPPORTED_LANGUAGES.map((lang) => (
+             <SelectItem key={lang.code} value={lang.code}>
+              <span className="mr-2">{lang.flag}</span>{lang.nativeName}
+             </SelectItem>
+            ))}
            </SelectContent>
           </Select>
          </div>
